@@ -1,179 +1,137 @@
-# norp-llm
-# SQL Chatbot Application
+# SQL Chatbot with RAG for Database Queries
 
-This application is a chatbot that interacts with users, generates SQL queries based on natural language input, and executes those queries on a database. It uses **LangChain** for conversational AI, **FastAPI** for the API, and **Redis** for session management.
-
----
-
-## Features
-
-- **Chatbot Interaction**: Conversational interface for users to ask SQL-related questions.
-- **SQL Query Generation**: Automatically constructs SQL queries from user input.
-- **Database Integration**: Executes queries against a connected database and retrieves results.
-- **Session Management**: Maintains conversational context using Redis.
-- **RESTful API**: Easy integration with other systems.
-- **Retrieval-Augmented Generation (RAG)**: Enhances SQL query generation by providing relevant schema context.
+This application is a chatbot that interacts with users, generates SQL queries based on natural language input, and executes those queries on a database. It uses **LangChain** for conversational AI, **FastAPI** for the API, **Redis** for session management, and **Retrieval-Augmented Generation (RAG)** for enhanced query performance.
 
 ---
 
-## Prerequisites
+## Overview
 
-### Software Requirements
-- Python 3.9 or higher
-- Redis server
-- A running SQL database (e.g., SQLite)
+### Features
 
-## Complete Setup From Scratch
+- **Natural Language to SQL**: Convert plain English questions into SQL queries automatically
+- **Database Integration**: Execute queries against a SQLite or MySQL database
+- **Conversational Memory**: Maintain context across multiple queries using Redis
+- **Schema-aware Responses**: RAG system provides relevant database schema context to improve query accuracy
+- **RESTful API**: Easy integration with frontend applications
 
-We provide a comprehensive setup script that automates the entire setup process. This script will:
+---
 
-1. Delete any existing SQLite database and vector database
-2. Set up a new SQLite database using the configuration
-3. Ingest all data into the new database
-4. Set up the RAG (Retrieval-Augmented Generation) system
-5. Verify Redis connectivity
-6. Run all tests to make sure everything works properly
+## Quick Setup Guide
 
-### Steps:
+If you're in a hurry, follow these steps to get the application running:
 
-1. Create and activate a conda environment:
-
+1. **Environment Setup**:
    ```bash
    conda create -n norp python=3.9
    conda activate norp
-   ```
-
-2. Install required packages:
-
-   ```bash
    pip install -r requirements.txt
    ```
 
-3. Run the setup script:
-
+2. **Run the Automated Setup**:
    ```bash
    python utils/setup_from_scratch.py
    ```
 
-4. The script will check dependencies, create the SQLite database, ingest all data, set up the RAG system, and run tests to verify everything is working correctly.
+3. **Start the Server** (from project root):
+   ```bash
+   python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8080
+   ```
 
-5. If you see "Setup completed successfully!" at the end, you're ready to use the system!
+4. **Test with a Query**:
+   ```bash
+   curl -X POST "http://127.0.0.1:8080/query" \
+     -H "Content-Type: application/json" \
+     -d '{"session_id": 123, "message": "Show me all data from us_shootings", "message_type": "human", "use_rag": true}'
+   ```
 
-## Manual Setup
+---
 
-If you prefer to set up components individually, follow these instructions:
+## Detailed Setup Instructions
 
-Create an environment using pip, activate the environment and install the required Python libraries using `pip`.
+### 1. Prerequisites
+
+- Python 3.9 or higher
+- Conda (recommended) or pip
+- Redis server running locally
+- Git (for cloning the repository)
+
+### 2. Environment Setup
+
+Create and activate a conda environment:
 
 ```bash
-conda create -n NORP_llm python=3.9
-conda activate NORP_LLM
+conda create -n norp python=3.9
+conda activate norp
+```
+
+### 3. Install Dependencies
+
+Install the required packages:
+
+```bash
 pip install -r requirements.txt
 ```
 
-For using an OpenAI token, create a folder named `sensitive` and a file `sensitive/openai.txt` that holds the OpenAI key.
+### 4. Configuration
 
-The file `llm-engine/app/config.json` holds the details for the SQL and Redis connections. The descriptions of the fields are given below
+The application uses a configuration file at `config/config.json` with the following structure:
 
 ```json
 {
-  "db_url": "The database URL which follows the schema mysql+mysqlconnector://{username}:{password}@{host}/{database_name}",
-  "db_username": "The username of the database",
-  "db_password": "The password of the database",
-  "redis_host_url": "The URL of the Redis host instance",
-  "redis_port": "(int) The port on which the Redis instance is being hosted",
-  "redis_password": "(Optional) The password of the Redis instance if authentication is enabled"
+  "db_url": "sqlite:///local_norp.db",
+  "db_username": "",
+  "db_password": "",
+  "redis_host_url": "localhost",
+  "redis_port": "6379",
+  "redis_password": null,
+  "openai_api_key": "your-openai-api-key"
 }
 ```
 
-## Setting up the Redis instance
-In order to set up the Redis instance, simply connect the port number to the `llm-engine/app/RedisManager.py` and `llm-engine/app/config.json`.
+Make sure this file exists and contains valid settings for your environment.
 
-## Setting up RAG for Schema Context
+### 5. Database and RAG Setup
 
-The RAG (Retrieval-Augmented Generation) pipeline enhances SQL query generation by providing the LLM with relevant schema context based on the user's query. This is particularly useful for databases with many tables, as it helps the model focus only on relevant tables and reduces hallucination of non-existent columns or tables.
+Run the automated setup script to:
+- Create the SQLite database
+- Import sample data
+- Build the vector database for RAG
+- Test the connections
 
-### How RAG Works
-
-1. Schema information from the database tables is embedded and stored in a vector database
-2. When a user asks a question, the system retrieves only the most relevant tables
-3. These relevant schema details are added to the prompt sent to the LLM
-4. The LLM generates a more accurate SQL query with the focused context
-
-### Setting Up RAG Manually
-
-If you didn't use the `setup_from_scratch.py` script, you can set up RAG manually:
-
-1. Ensure you have the SQLite database ready:
-   ```bash
-   # Copy the example database if you don't have one
-   cp llm-engine/app/local_database_setup/local_norp.db .
-   ```
-
-2. Create the vector database:
-   ```bash
-   # This will process the schema files and database tables,
-   # and create embeddings in the rag/vectordb directory
-   python utils/create_vectordb.py
-   ```
-
-3. Test the RAG implementation:
-   ```bash
-   python tests/test_rag.py
-   ```
-
-4. Enable RAG in API requests by setting the `use_rag` parameter to `true`:
-   ```json
-   {
-     "session_id": "123",
-     "message": "Show me all shootings in New York",
-     "message_type": "human",
-     "use_rag": true
-   }
-   ```
-
-## Running the app
-To run the server, use the following command
-```
-cd ./llm-engine/app
-uvicorn app:app --reload --host 127.0.0.1 --port 8000
+```bash
+python utils/setup_from_scratch.py
 ```
 
-## Setting up the database connection
-You can use SQLite or MySQL for your database connection. Update the database URL in `config.json` accordingly.
+### 6. Starting the Server
 
-For SQLite (default):
-```json
-"db_url": "sqlite:///local_norp.db"
+Start the application from the project root directory:
+
+```bash
+# From the project root (not the app directory)
+python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8080
 ```
 
-For MySQL:
-```json
-"db_url": "mysql+mysqlconnector://{username}:{password}@{host}/{database_name}"
+**Note**: If port 8080 is already in use, you'll see an error like `[Errno 48] Address already in use`. In that case, try a different port:
+
+```bash
+python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8081
 ```
 
-## Hitting the app with API requests
-First approach is using a CURL command after the app is running.
-```
-Invoke-RestMethod -Uri "http://127.0.0.1:8000/query" ` 
+### 7. Testing the API
 
-  -Method Post ` 
+You can test the API using curl:
 
-  -ContentType "application/json" ` 
-
-  -Body '{"question": "Give me the number of employees who are male", "session_id": 12345, "message_type": "human"}' 
-```
-Another approach is to run `test_responses.py` script.
-```
-python test_responses.py --question "For each month, get count of victims killed and average of victims killed in each shooting incident." --session_id 585
+```bash
+curl -X POST "http://127.0.0.1:8080/query" \
+  -H "Content-Type: application/json" \
+  -d '{"session_id": 123, "message": "Show me all data from us_shootings", "message_type": "human", "use_rag": true}'
 ```
 
-## Local Setup
-1. To test locally setup local database and Redis instance in desired way and ensure to connect the port numbers and relevant URLs.
-2. Now, run `create_NORP_tables.py` to create local sample tables after filling
-in the correct details for the database username and password.
-3. Run the app using `uvicorn app:app --reload --host 127.0.0.1 --port 8000`
-4. Use `test_responses.py` script to see the results.
+Or using the test script:
+
+```bash
+python tests/test_responses.py --question "For each month, get count of victims killed in shooting incidents." --session_id 123
+```
 
 ## Troubleshooting
 
@@ -187,11 +145,93 @@ fromisoformat: argument must be str
 This error is related to date parsing in the application. Despite this error message, the application is still functional and can successfully retrieve and process data from the database. The error occurs when:
 
 1. A POST request is made to the `/query` endpoint
-2. The application processes the request and performs RAG operations
+2. The application processes the request and performs date-related operations
 
 **Workaround**: You can safely ignore this error as it doesn't prevent the application from functioning correctly. The API will still return valid responses to your queries.
 
-If you're developing or extending this application, you may want to investigate the date parsing code to properly handle the format of timestamps being processed.
+### Session ID Type Error
+
+If you see an error related to the session_id validation like:
+```
+Input should be a valid integer, unable to parse string as an integer
+```
+
+Make sure to use an integer (not a string) for session_id in your requests:
+
+```json
+{"session_id": 123, "message": "Your question", "message_type": "human"}
+```
+
+### Module Not Found Errors
+
+If you encounter a "No module named 'services'" error, make sure you're running the application from the project root directory, not from within the app directory. The Python path needs to include the project root.
+
+### Running on a Different Port
+
+If the default port (8080) is already in use, you'll see an error like `[Errno 48] Address already in use`. Try a different port by modifying the port number in the command:
+
+```bash
+python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8081
+```
+
+## Advanced Setup
+
+### Manual RAG Setup
+
+If you prefer to set up the RAG system manually:
+
+1. Ensure you have the SQLite database ready:
+   ```bash
+   python utils/populate_sql.py
+   ```
+
+2. Create the vector database:
+   ```bash
+   python utils/create_vectordb.py
+   ```
+
+3. Test the RAG implementation:
+   ```bash
+   python tests/test_rag.py
+   ```
+
+### Using MySQL Instead of SQLite
+
+To use MySQL instead of SQLite, update the database URL in `config/config.json`:
+
+```json
+"db_url": "mysql+mysqlconnector://{username}:{password}@{host}/{database_name}"
+```
+
+And make sure to provide the appropriate username and password.
+
+## API Reference
+
+### POST /query
+
+Main endpoint for interacting with the chatbot.
+
+**Request Format**:
+```json
+{
+  "session_id": 123,
+  "message": "Show me all shootings in New York",
+  "message_type": "human",
+  "use_rag": true
+}
+```
+
+**Response Format**:
+```json
+{
+  "session_id": "123",
+  "response": "Here are the shootings in New York...",
+  "sql_query": "SELECT * FROM us_shootings WHERE state = 'New York'",
+  "sql_valid": true,
+  "query_result": "[...]",
+  "history": [...]
+}
+```
 
 ---
 
