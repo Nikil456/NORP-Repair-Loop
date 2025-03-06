@@ -1,16 +1,21 @@
+import os
+import sys
+
+# Add the parent directory to the path to find modules
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
-from services.ServiceManager import ServiceManager
+from services.service_manager import ServiceManager
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.base import Chain
 import gnupg
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 import json
-import os
 from langchain.memory import ConversationBufferMemory
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -32,18 +37,40 @@ SENSITIVE_PATH = "sensitive/openai.txt"
 # gpg = gnupg.GPG(binary=GPG_BINARY_PATH)
 def read_json(file_name):
     try:
-        with open(file_name, 'r') as file:
-            data = json.load(file)
-            return data
+        # Try to open the file from the current directory first
+        try:
+            with open(file_name, 'r') as file:
+                data = json.load(file)
+                return data
+        except FileNotFoundError:
+            # If not found, try from the config directory
+            config_path = os.path.join('config', file_name)
+            with open(config_path, 'r') as file:
+                data = json.load(file)
+                return data
     except FileNotFoundError:
         print(f"Error: File '{file_name}' not found.")
+        return None
     except json.JSONDecodeError:
         print(f"Error: File '{file_name}' is not a valid JSON.")
+        return None
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+        return None
 
 # Example usage
 config_details = read_json('config.json')
+if config_details is None:
+    print("Failed to load configuration. Using default values.")
+    config_details = {
+        "db_url": "sqlite:///local_norp.db",
+        "db_username": "",
+        "db_password": "",
+        "redis_host_url": "localhost",
+        "redis_port": "6379",
+        "redis_password": None,
+        "openai_api_key": "REDACTED"
+    }
 
 app = FastAPI()
 
@@ -168,7 +195,7 @@ def run_sql_chain(question: str, history: List[dict], session_id: str, memory: C
 
 # Define the request body model using Pydantic
 class ChatRequest(BaseModel):
-    session_id: int
+    session_id: Union[int, str]  # Accept either int or str for session_id
     message: str
     message_type: str
     use_rag: bool = False  # Optional flag to enable RAG, defaults to False
@@ -180,51 +207,77 @@ class ChatResponse(BaseModel):
     sql_valid: bool
     query_result: Optional[str]
 
-def get_message_history(session_id: str) -> ConversationBufferMemory:
-    """Retrieve chat history for a session from Redis cache"""
-    memory = ConversationBufferMemory(
-        memory_key="history",
-        return_messages=True
-    )
-    cached_messages = redis_client.lrange(f"chat:{session_id}", 0, -1)
-    print("length of cached essages ", len(cached_messages))
-    if cached_messages:
-        for msg in cached_messages:
-            msg = json.loads(msg)
-            if msg['type'] == 'human':
-                memory.chat_memory.add_message(HumanMessage(content=msg['content']))
-            elif msg['type'] == 'ai':
-                memory.chat_memory.add_message(AIMessage(content=msg['content']))
-            elif msg['type'] == 'system':
-                memory.chat_memory.add_message(SystemMessage(content=msg['content']))
-    return memory
+def get_message_history(session_id: Union[int, str]) -> ConversationBufferMemory:
+    """Get message history from Redis cache or create a new memory object"""
+    try:
+        # Convert the session_id to string to ensure consistent key format
+        session_id_str = str(session_id)
+        
+        # Check if we have a cache for this session ID
+        cached_messages = redis_client.lrange(f"chat:{session_id_str}", 0, -1)
+        print(f"length of cached essages  {len(cached_messages)}")
+        
+        # Create a new ConversationBufferMemory
+        memory = ConversationBufferMemory(
+            memory_key="history",
+            return_messages=True,
+        )
+
+        # If we have cached messages, add them to the memory
+        if cached_messages:
+            for message_json in cached_messages:
+                try:
+                    message = json.loads(message_json)
+                    if message["type"] == "human":
+                        memory.chat_memory.add_message(HumanMessage(content=message["content"]))
+                    elif message["type"] == "ai":
+                        memory.chat_memory.add_message(AIMessage(content=message["content"]))
+                    elif message["type"] == "system":
+                        memory.chat_memory.add_message(SystemMessage(content=message["content"]))
+                except Exception as e:
+                    print(f"Error parsing cached message: {e}")
+                    continue
+        
+        return memory
+    except Exception as e:
+        print(f"Error getting message history: {e}")
+        # Return a new memory object in case of error
+        return ConversationBufferMemory(memory_key="history", return_messages=True)
 
 
-def update_chat_memory_and_redis_history(session_id: str, message_content:str, message_type:str, 
+def update_chat_memory_and_redis_history(session_id: Union[int, str], message_content:str, message_type:str, 
                                          memory: ConversationBufferMemory) -> ConversationBufferMemory:
     """Save updated chat history to Redis cache and memory object"""
-    # Update cache
-    message = {
-        "type": message_type,
-        "content": message_content
-    }
-    # Convert the message to a JSON string
-    message_json = json.dumps(message)
-    # Append the message to the list associated with the session ID
-    # rpush takes care if the session_id does not exist
-    redis_client.rpush(f"chat:{session_id}", message_json)
-    # Update the TTL for the session ID
-    redis_client.expire(session_id, CHAT_HISTORY_TTL)
-    print(f"Message appended to session {session_id} and TTL updated to {CHAT_HISTORY_TTL} seconds")
+    try:
+        # Convert the session_id to string to ensure consistent key format
+        session_id_str = str(session_id)
+        
+        # Update cache
+        message = {
+            "type": message_type,
+            "content": message_content
+        }
+        # Convert the message to a JSON string
+        message_json = json.dumps(message)
+        # Append the message to the list associated with the session ID
+        # rpush takes care if the session_id does not exist
+        redis_client.rpush(f"chat:{session_id_str}", message_json)
+        # Update the TTL for the session ID
+        redis_client.expire(f"chat:{session_id_str}", CHAT_HISTORY_TTL)
+        print(f"Message appended to session {session_id_str} and TTL updated to {CHAT_HISTORY_TTL} seconds")
 
-    # Update conversation buffer memory
-    if message_type == 'human':
-        memory.chat_memory.add_message(HumanMessage(content=message_content))
-    elif message_type == 'ai':
-        memory.chat_memory.add_message(AIMessage(content=message_content))
-    elif message_type == 'system':
-        memory.chat_memory.add_message(SystemMessage(content=message_content))
-    return memory
+        # Update conversation buffer memory
+        if message_type == 'human':
+            memory.chat_memory.add_message(HumanMessage(content=message_content))
+        elif message_type == 'ai':
+            memory.chat_memory.add_message(AIMessage(content=message_content))
+        elif message_type == 'system':
+            memory.chat_memory.add_message(SystemMessage(content=message_content))
+        
+        return memory
+    except Exception as e:
+        print(f"Error updating chat memory: {e}")
+        return memory
 
 def execute_sql_query(sql_query:str):
     execute_query = QuerySQLDataBaseTool(db=db)

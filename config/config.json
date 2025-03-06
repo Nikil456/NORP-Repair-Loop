@@ -5,5 +5,5 @@
   "redis_host_url": "localhost",
   "redis_port": "6379",
   "redis_password": null,
-  "openai_api_key": ""
+  "openai_api_key": "REDACTED"
 }

@@ -174,3 +174,4 @@ llm-engine/pyproject.toml
 local_norp.db
 rag/vectordb/*
 *.bin
+*.db
