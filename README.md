@@ -2,6 +2,8 @@
 
 This application is a chatbot that interacts with users, generates SQL queries based on natural language input, and executes those queries on a database. It uses **LangChain** for conversational AI, **FastAPI** for the API, **Redis** for session management, and **Retrieval-Augmented Generation (RAG)** for enhanced query performance.
 
+> **Important**: This repository does not include the SQLite database or vector database files needed to run the application. These files are excluded via `.gitignore` and must be created by following the setup instructions below.
+
 ---
 
 ## Overview
@@ -42,9 +44,9 @@ Install the required packages:
 pip install -r requirements.txt
 ```
 
-### 4. Download Dataset Files
+### 4. Download Dataset Files (CRITICAL)
 
-The application requires CSV data files that are not included in the repository (they're excluded in .gitignore). You need to download these files separately and place them in the correct directory:
+The application requires CSV data files that are not included in the repository (they're excluded in .gitignore). **This step is critical** as these files are needed to create the SQLite database:
 
 1. Download all CSV files from the following Dropbox link:
    [NORP Dataset Files](https://www.dropbox.com/scl/fo/s38flokz0gqaw1g8hg6px/ANpD64fQsx3gqXsBCN2j2Mg?rlkey=0x1506snhcpfpfh1vq3dlfmc9&st=fpe8a1x8&dl=0)
@@ -56,7 +58,7 @@ The application requires CSV data files that are not included in the repository 
 
 3. Place all downloaded CSV files in the `dataset/norp/csv` directory.
 
-These files contain the necessary data that will be imported into the SQLite database during the setup process.
+These files contain the necessary data that will be imported into the SQLite database during the setup process. Without these files, the setup script will fail and the application will not function properly.
 
 ### 5. Configuration
 
@@ -74,19 +76,31 @@ The application uses a configuration file at `config/config.json` with the follo
 }
 ```
 
-Make sure this file exists and contains valid settings for your environment.
+Make sure this file exists and contains valid settings for your environment, particularly the OpenAI API key if you're using the hosted model.
 
-### 6. Database and RAG Setup
+### 6. Database and RAG Setup (CRITICAL)
+
+> **Important**: This step is essential as both the SQLite database and vector database files are not included in the repository (.gitignore excludes `local_norp.db` and `rag/vectordb/*`).
 
 Run the automated setup script to:
-- Create the SQLite database
-- Import sample data
-- Build the vector database for RAG
+- Create the SQLite database (`local_norp.db`) from the CSV files
+- Import all sample data into tables
+- Build the vector database for RAG functionality
 - Test the connections
 
 ```bash
 python utils/setup_from_scratch.py
 ```
+
+This script will:
+1. Delete any existing SQLite database and vector database
+2. Create a new SQLite database using the configuration
+3. Import all CSV data into the database tables
+4. Process schema files and create the vector database
+5. Verify Redis connectivity
+6. Run tests to ensure everything works properly
+
+Without running this script, you will not have the required database files and the application will not function.
 
 ### 7. Starting the Server
 
@@ -122,6 +136,18 @@ python tests/test_responses.py --question "For each month, get count of victims 
 ```
 
 ## Troubleshooting
+
+### Missing Database Files
+
+If you encounter errors about missing database files or vector database not found:
+
+1. Make sure you've downloaded the CSV files as described in step 4
+2. Verify that you've run the setup script: `python utils/setup_from_scratch.py`
+3. Check that the files have been created:
+   - SQLite database: `local_norp.db` in the project root
+   - Vector database: Files in the `rag/vectordb/` directory
+
+These files are generated during setup and are not included in the repository.
 
 ### Date Parsing Error
 
@@ -183,7 +209,7 @@ python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8081
 
 ### Manual RAG Setup
 
-If you prefer to set up the RAG system manually:
+If you prefer to set up the RAG system manually (rather than using the automated setup script):
 
 1. Ensure you have the SQLite database ready:
    ```bash
@@ -199,6 +225,8 @@ If you prefer to set up the RAG system manually:
    ```bash
    python tests/test_rag.py
    ```
+
+Both steps 1 and 2 are critical as they create the files excluded from the repository.
 
 ### Using MySQL Instead of SQLite
 
@@ -220,7 +248,7 @@ Main endpoint for interacting with the chatbot.
 ```json
 {
   "session_id": 123,
-  "message": "Show me all shootings in New York",
+  "question": "Show me all shootings in New York",
   "message_type": "human",
   "use_rag": true
 }
