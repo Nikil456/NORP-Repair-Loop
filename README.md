@@ -16,37 +16,7 @@ This application is a chatbot that interacts with users, generates SQL queries b
 
 ---
 
-## Quick Setup Guide
-
-If you're in a hurry, follow these steps to get the application running:
-
-1. **Environment Setup**:
-   ```bash
-   conda create -n norp python=3.9
-   conda activate norp
-   pip install -r requirements.txt
-   ```
-
-2. **Run the Automated Setup**:
-   ```bash
-   python utils/setup_from_scratch.py
-   ```
-
-3. **Start the Server** (from project root):
-   ```bash
-   python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8080
-   ```
-
-4. **Test with a Query**:
-   ```bash
-   curl -X POST "http://127.0.0.1:8080/query" \
-     -H "Content-Type: application/json" \
-     -d '{"session_id": 123, "message": "Show me all data from us_shootings", "message_type": "human", "use_rag": true}'
-   ```
-
----
-
-## Detailed Setup Instructions
+## Setup Instructions
 
 ### 1. Prerequisites
 
@@ -72,7 +42,23 @@ Install the required packages:
 pip install -r requirements.txt
 ```
 
-### 4. Configuration
+### 4. Download Dataset Files
+
+The application requires CSV data files that are not included in the repository (they're excluded in .gitignore). You need to download these files separately and place them in the correct directory:
+
+1. Download all CSV files from the following Dropbox link:
+   [NORP Dataset Files](https://www.dropbox.com/scl/fo/s38flokz0gqaw1g8hg6px/ANpD64fQsx3gqXsBCN2j2Mg?rlkey=0x1506snhcpfpfh1vq3dlfmc9&st=fpe8a1x8&dl=0)
+
+2. Create the directory structure if it doesn't exist:
+   ```bash
+   mkdir -p dataset/norp/csv
+   ```
+
+3. Place all downloaded CSV files in the `dataset/norp/csv` directory.
+
+These files contain the necessary data that will be imported into the SQLite database during the setup process.
+
+### 5. Configuration
 
 The application uses a configuration file at `config/config.json` with the following structure:
 
@@ -90,7 +76,7 @@ The application uses a configuration file at `config/config.json` with the follo
 
 Make sure this file exists and contains valid settings for your environment.
 
-### 5. Database and RAG Setup
+### 6. Database and RAG Setup
 
 Run the automated setup script to:
 - Create the SQLite database
@@ -102,7 +88,7 @@ Run the automated setup script to:
 python utils/setup_from_scratch.py
 ```
 
-### 6. Starting the Server
+### 7. Starting the Server
 
 Start the application from the project root directory:
 
@@ -117,7 +103,7 @@ python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8080
 python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8081
 ```
 
-### 7. Testing the API
+### 8. Testing the API
 
 You can test the API using curl:
 
@@ -161,7 +147,24 @@ Input should be a valid integer, unable to parse string as an integer
 Make sure to use an integer (not a string) for session_id in your requests:
 
 ```json
-{"session_id": 123, "message": "Your question", "message_type": "human"}
+{"session_id": 123, "question": "Your question", "message_type": "human"}
+```
+
+This is a common issue when testing with curl or Python scripts. The session_id **must** be passed as a numeric value (not in quotes). For example:
+
+**Correct:**
+```json
+{"session_id": 123}
+```
+
+**Incorrect:**
+```json
+{"session_id": "123"}
+```
+
+If you're using the test_responses.py script, ensure the session_id is passed correctly:
+```bash
+python tests/test_responses.py --question "Your question" --session_id 123
 ```
 
 ### Module Not Found Errors
