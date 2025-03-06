@@ -124,10 +124,12 @@ You can test the API using curl:
 ```bash
 curl -X POST "http://127.0.0.1:8080/query" \
   -H "Content-Type: application/json" \
-  -d '{"session_id": 123, "message": "Show me all data from us_shootings", "message_type": "human", "use_rag": true}'
+  -d '{"session_id": 123, "question": "Show me all data from us_shootings", "message_type": "human", "use_rag": true}'
 ```
 
-Or using the test script:
+> **Important**: Note that the API expects the user query in a field named `"question"`, not `"message"`. This is different from the model definition but required for the endpoint to work correctly.
+
+Or using the test script (which will need modification to use "question" instead of "message"):
 
 ```bash
 python tests/test_responses.py --question "For each month, get count of victims killed in shooting incidents." --session_id 123
@@ -230,6 +232,33 @@ Main endpoint for interacting with the chatbot.
   "sql_valid": true,
   "query_result": "[...]",
   "history": [...]
+}
+```
+
+### Using the test_responses.py Script
+
+The repository includes a test script that provides a convenient way to test the API. To use it:
+
+1. Make sure the server is running (on port 8080)
+2. Run the test script with the following format:
+
+```bash
+python tests/test_responses.py --question "Your question here" --session_id 123
+```
+
+The script will:
+1. Format the request correctly, using "question" as the parameter name
+2. Send the request to the API
+3. Pretty-print the response, including SQL query and results
+
+**Note**: The test script has been updated to use "question" instead of "message" in the API request to match what the server expects. If you encounter errors, make sure your test_responses.py has the correct parameter name in the payload:
+
+```python
+payload = {
+    "session_id": session_id, 
+    "question": question,  # Must be "question", not "message"
+    "message_type": "human",
+    "use_rag": use_rag
 }
 ```
 
