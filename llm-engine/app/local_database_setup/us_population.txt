@@ -1,5 +1,0 @@
-2010; alabama; 4779736
-2010; alaska; 710231
-2010; american samoa; 55519
-2010; arizona; 6392017
-2010; arkansas; 477936

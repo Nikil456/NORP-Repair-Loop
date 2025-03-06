@@ -1,0 +1,12 @@
+CREATE TABLE us_shootings (
+    IncidentID INT PRIMARY KEY,
+    Address TEXT,
+    IncidentDate DATE,
+    State VARCHAR(50),
+    CityOrCountry VARCHAR(100),
+    VictimsKilled INT,
+    VictimsInjured INT,
+    SuspectsInjured INT,
+    SuspectsKilled INT,
+    SuspectsArrested INT
+); 

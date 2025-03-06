@@ -1,0 +1,4 @@
+CREATE TABLE us_population_county (
+    PopulationCount INT,
+    County VARCHAR(100)
+); 

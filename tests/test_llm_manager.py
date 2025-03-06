@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import BaseMessage
-from app.LLMManager import LLMManager
+from services.llm_manager.LLMManager import LLMManager
 
 class TestLLMManager(unittest.TestCase):
     @patch("app.LLMManager.read_gpg_encrypted_file")

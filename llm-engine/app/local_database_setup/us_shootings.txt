@@ -1,5 +1,0 @@
-92194; Rockingham Street and Berkley Avenue Extended; January 1, 2014; virginia; Norfolk; 2; 2; 0; 0; 0
-92704; Farmers Boulevard and 133rd Avenue; January 3, 2014; new york; Queens; 1; 3; 0; 0; 0
-94514; 829 Parade St; January 5, 2014; pennsylvania; Erie; 1; 3; 0; 0; 0
-95146; 3430 W. Capitol Street; January 11, 2014; mississippi; Jackson; 0; 4; 0; 0; 0
-95500; 3600 block of Highway 80 W; January 12, 2014; louisiana; Tallulah; 0; 6; 0; 0; 8

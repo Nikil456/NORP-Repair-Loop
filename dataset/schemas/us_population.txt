@@ -1,0 +1,5 @@
+CREATE TABLE us_population (
+    CensurYear INT,
+    State VARCHAR(100),
+    PopulationCount INT
+); 

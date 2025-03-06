@@ -1,5 +1,0 @@
-2017; California; 25-34; 28654
-2017; California; 35-44; 25831
-2017; California; 45-54; 27651
-2017; California; 55-64; 23396
-2017; California; 65+; 7111

@@ -1,0 +1,6 @@
+CREATE TABLE experiencing_homelessness_age_demographics (
+    CALENDAR_YEAR VARCHAR(10),
+    LOCATION VARCHAR(100),
+    AGE_GROUP_PUBLIC VARCHAR(20),
+    EXPERIENCING_HOMELESSNESS_CNT INT
+); 

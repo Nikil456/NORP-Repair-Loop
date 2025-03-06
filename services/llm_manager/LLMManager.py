@@ -4,7 +4,7 @@ Module to connect with LLM.
 import os
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from util import read_gpg_encrypted_file
+from utils.util import read_gpg_encrypted_file
 
 # TODO: Make this an env variable
 # Simply add the private key for LLM you are using

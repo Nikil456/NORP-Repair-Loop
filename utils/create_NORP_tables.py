@@ -1,5 +1,6 @@
 import sqlite3
 import csv
+import os
 
 import mysql.connector
 import pandas as pd
@@ -9,7 +10,7 @@ import pandas as pd
 HOST     = '127.0.0.1'
 DATABASE = 'local_norp'
 USER     = 'root'
-PASSWORD = 'your password'
+PASSWORD = 'newpassword'
 # ----------------------------------------------------------------------------------------------------------------------------
 # CREATE DATABASE
 # ----------------------------------------------------------------------------------------------------------------------------
@@ -53,140 +54,18 @@ conn = mysql.connector.connect(
 cursor = conn.cursor()
 print("Connection Successful")
 
-#! US SHOOTINGS
-cursor.execute("""
-CREATE TABLE us_shootings (
-    IncidentID INT PRIMARY KEY,
-    Address TEXT,
-    IncidentDate DATE,
-    State VARCHAR(50),
-    CityOrCountry VARCHAR(100),
-    VictimsKilled INT,
-    VictimsInjured INT,
-    SuspectsInjured INT,
-    SuspectsKilled INT,
-    SuspectsArrested INT
-);
-""")
+# Read schema files from directory and create tables
+schema_dir = "dataset/schemas"
+schema_files = os.listdir(schema_dir)
 
-cursor.execute("""
-CREATE TABLE experiencing_homelessness_age_demographics (
-    CALENDAR_YEAR VARCHAR(10),
-    LOCATION VARCHAR(100),
-    AGE_GROUP_PUBLIC VARCHAR(20),
-    EXPERIENCING_HOMELESSNESS_CNT INT
-);
-""")
-
-cursor.execute("""
-CREATE TABLE us_population (
-    CensurYear INT,
-    State VARCHAR(100),
-    PopulationCount INT
-);
-""")
-
-cursor.execute("""
-CREATE TABLE food_access (
-    CensusTract BIGINT,
-    State VARCHAR(100),
-    County VARCHAR(100),
-    Urban BOOLEAN,
-    Pop2010 INT,
-    Ohu2010 INT,
-    LILATracts_1And10 BOOLEAN,
-    LILATracts_halfAnd10 BOOLEAN,
-    LILATracks_1And20 BOOLEAN,
-    LILATractsVehicle BOOLEAN,
-    HUNVFlag BOOLEAN,
-    LowIncomeTracts BOOLEAN,
-    PovertyRate FLOAT,
-    MedianFamilyIncome FLOAT,
-    LA1and10 BOOLEAN,
-    LAhalfand10 BOOLEAN,
-    LA1and20 BOOLEAN,
-    LATracts_half BOOLEAN,
-    LATracts1 BOOLEAN,
-    LATracts10 BOOLEAN,
-    LATracts20 BOOLEAN,
-    LATractsVehicle_20 BOOLEAN,
-    LAPOP1_10 FLOAT,
-    LAPOP05_10 FLOAT,
-    LAPOP1_20 FLOAT,
-    LALOWI1_10 FLOAT,
-    LALOWI05_10 FLOAT,
-    LALOWI1_20 FLOAT,
-    lapophalf FLOAT,
-    lalowihalf FLOAT,
-    lakidshalf FLOAT,
-    laseniorshalf FLOAT,
-    lawhitehalf FLOAT,
-    lablackhalf FLOAT,
-    laasianhalf FLOAT,
-    lanhopihalf FLOAT,
-    laaianhalf FLOAT,
-    laomultirhalf FLOAT,
-    lahisphalf FLOAT,
-    lahunvhalf FLOAT,
-    lasnaphalf FLOAT,
-    lapop1 FLOAT,
-    lalowi1 FLOAT,
-    lakids1 FLOAT,
-    laseniors1 FLOAT,
-    lawhite1 FLOAT,
-    lablack1 FLOAT,
-    laasian1 FLOAT,
-    lanhopi1 FLOAT,
-    laaian1 FLOAT,
-    laomultir1 FLOAT,
-    lahisp1 FLOAT,
-    lahunv1 FLOAT,
-    lasnap1 FLOAT,
-    lapop10 FLOAT,
-    lalowi10 FLOAT,
-    lakids10 FLOAT,
-    laseniors10 FLOAT,
-    lawhite10 FLOAT,
-    lablack10 FLOAT,
-    laasian10 FLOAT,
-    lanhopi10 FLOAT,
-    laaian10 FLOAT,
-    laomultir10 FLOAT,
-    lahisp10 FLOAT,
-    lahunv10 FLOAT,
-    lasnap10 FLOAT,
-    lapop20 FLOAT,
-    lalowi20 FLOAT,
-    lakids20 FLOAT,
-    laseniors20 FLOAT,
-    lawhite20 FLOAT,
-    lablack20 FLOAT,
-    laasian20 FLOAT,
-    lanhopi20 FLOAT,
-    laaian20 FLOAT,
-    laomultir20 FLOAT,
-    lahisp20 FLOAT,
-    lahunv20 FLOAT,
-    lasnap20 FLOAT,
-    TractLOWI FLOAT,
-    TractKids FLOAT,
-    TractSeniors FLOAT,
-    TractWhite FLOAT,
-    TractBlack FLOAT,
-    TractAsian FLOAT,
-    TractNHOPI FLOAT,
-    TractAIAN FLOAT,
-    TractOMultir FLOAT,
-    TractHispanic FLOAT,
-    TractHUNV FLOAT,
-    TractSNAP FLOAT
-);
-""")
-cursor.execute("""CREATE TABLE us_population_county (
-    PopulationCount INT,
-    County VARCHAR(100)
-);
-""")
+for schema_file in schema_files:
+    if schema_file.endswith(".txt"):
+        file_path = os.path.join(schema_dir, schema_file)
+        with open(file_path, 'r') as f:
+            schema_sql = f.read()
+            cursor.execute(schema_sql)
+            table_name = schema_file.replace(".txt", "")
+            print(f"Created table {table_name}")
 
 # Function to upload data from a text file
 def upload_data_from_file(file_path, insert_query):

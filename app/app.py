@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
-from ServiceManager import ServiceManager
+from services.ServiceManager import ServiceManager
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.base import Chain
@@ -10,13 +10,21 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import json
+import os
 from langchain.memory import ConversationBufferMemory
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompt_values import ChatPromptValue
 from langchain_core.runnables.base import RunnableLambda
-from constants import *
-from prompts import *
+from utils.constants import *
+from config.prompts import *
+
+# Import RAG if available
+try:
+    from rag.rag import SchemaRAG
+    rag_available = True
+except ImportError:
+    rag_available = False
 
 # GPG_BINARY_PATH = "/opt/homebrew/bin/gpg"
 SENSITIVE_PATH = "sensitive/openai.txt"
@@ -64,11 +72,25 @@ class ChatResponse(BaseModel):
     query_result: Optional[str]
     history: List[dict]
 
-def run_sql_chain(question: str, history: List[dict], session_id: str, memory: ConversationBufferMemory):
+def run_sql_chain(question: str, history: List[dict], session_id: str, memory: ConversationBufferMemory, use_rag: bool = False):
     """Run the SQL generation chain with conversation history"""
-    # TODO implement just the relavant tables information if needed
-    # this might totally remove the below separation format
-    table_info = db.get_table_info()
+    
+    # Get table information - use RAG if enabled and available
+    if use_rag and rag_available:
+        # Initialize SchemaRAG
+        schema_rag = SchemaRAG()
+        
+        # Get relevant table info using RAG
+        if schema_rag.is_initialized():
+            table_info = schema_rag.get_table_info_for_rag(question)
+            if not table_info:  # Fallback to complete table info if RAG returns nothing
+                table_info = db.get_table_info()
+        else:
+            # Fallback to regular table_info if RAG not initialized
+            table_info = db.get_table_info()
+    else:
+        # Use regular table info
+        table_info = db.get_table_info()
  
     # Prepare messages for the prompt
     messages = []
@@ -149,6 +171,7 @@ class ChatRequest(BaseModel):
     session_id: int
     message: str
     message_type: str
+    use_rag: bool = False  # Optional flag to enable RAG, defaults to False
 
 class ChatResponse(BaseModel):
     session_id: str
@@ -223,7 +246,8 @@ async def handle_query(request: Request):
     chat_request = ChatRequest(
         session_id=json_data["session_id"],
         message=json_data["question"],
-        message_type=json_data["message_type"]
+        message_type=json_data["message_type"],
+        use_rag=json_data.get("use_rag", False)  # Get use_rag flag with default value
     )
     if not chat_request.message:
         raise HTTPException(status_code=400, detail="No question provided")
@@ -236,7 +260,8 @@ async def handle_query(request: Request):
             chat_request.message,
             memory.load_memory_variables({})["history"],
             chat_request.session_id,
-            memory
+            memory,
+            chat_request.use_rag  # Pass the use_rag flag to the chain
         )
     except Exception as e:
         print(e)

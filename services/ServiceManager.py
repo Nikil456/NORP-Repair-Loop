@@ -1,6 +1,6 @@
-from DatabaseManager import DatabaseManager
-from LLMManager import LLMManager
-from RedisManager import RedisManager
+from sql_manager.DatabaseManager import DatabaseManager
+from services.llm_manager.LLMManager import LLMManager
+from redis_manager.RedisManager import RedisManager
 from fastapi import HTTPException
 
 class ServiceManager:
