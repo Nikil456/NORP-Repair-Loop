@@ -2,7 +2,7 @@ from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 ## Prompts to create SQL query
 # This is the first prompt with all table schema, 3 rows of every table information
-INITIAL_DATABASE_INFO_PROMPT = "You are a MySQL expert. Given an input question, create a syntactically correct SQL query to run. Unless otherwise specified, do not return more than {top_k} rows.\n\nHere is the relevant table info: {table_info}."
+INITIAL_DATABASE_INFO_PROMPT = "You are a SQLite expert. Given an input question, create a syntactically correct SQL query to run. Unless otherwise specified, do not return more than {top_k} rows.\n\nHere is the relevant table info: {table_info}."
 # For upcoming chat, where table info is already present in the history
 CONTINUATION_PROMPT = "Generate ONLY the SQL query based on user's question and history. Filter out rows with any NULL field. If the question is unclear, try your best to create SQL query."
 RESPONSE_FORMAT = " IMPORTANT: Respond ONLY with the complete SQL query, without any additional text or explanation."
@@ -10,7 +10,7 @@ RESPONSE_FORMAT = " IMPORTANT: Respond ONLY with the complete SQL query, without
 FAILURE_MESSAGE_FORMAT = " If you could not generate a SQL query, give the reason in at most 50 words."
 # Aggregated Group by
 GROUP_BY_PROMPT = """
-    While working with MySQL databases under `ONLY_FULL_GROUP_BY` mode.
+    While working with SQLite databases:
     Ensure the query satisfies:
     1. All non-aggregated columns in the `SELECT` list are included in the `GROUP BY` clause or are aggregated.
     2. Use aggregate functions appropriately.
@@ -21,7 +21,7 @@ GROUP_BY_PROMPT_V2 = """
 3. Provide meaningful aliases for calculated columns.
 """
 GROUP_BY_PROMPT_V3 = """
-You are a SQL expert working with MySQL databases under `ONLY_FULL_GROUP_BY` mode.
+You are a SQL expert working with SQLite databases.
 Constraints:
 1. Ensure all non-aggregated columns in the `SELECT` list are included in the `GROUP BY` clause or are aggregated.
 2. Use aggregate functions appropriately to avoid grouping errors.

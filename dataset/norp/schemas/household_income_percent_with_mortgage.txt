@@ -1,0 +1,8 @@
+CREATE TABLE household_income_percent_with_mortgage (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Number_Of_Units INT,
+    Income_Percent_Min INT,
+    Income_Percent_Max INT
+); 

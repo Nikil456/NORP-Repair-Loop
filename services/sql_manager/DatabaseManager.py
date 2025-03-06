@@ -8,7 +8,7 @@ class DatabaseManager:
         Args:
             uri (str): The uri of the database.
         """
-        # Update below for connecting with local MySQL database
+        # Initialize the SQLite database connection
         self.db = SQLDatabase.from_uri(uri)
 
     def execute(self, query):

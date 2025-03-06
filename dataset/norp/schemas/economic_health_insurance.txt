@@ -1,0 +1,8 @@
+CREATE TABLE economic_health_insurance (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Total_Population INT,
+    With_Health_Insurance INT,
+    No_Health_Insurance INT
+); 

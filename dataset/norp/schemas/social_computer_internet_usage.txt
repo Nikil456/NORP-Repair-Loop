@@ -1,0 +1,8 @@
+CREATE TABLE social_computer_internet_usage (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Total_Households INT,
+    With_A_Computer INT,
+    With_Broadband_Internet_Subscription INT
+); 

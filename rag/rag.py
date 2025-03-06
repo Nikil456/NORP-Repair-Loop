@@ -1,144 +1,247 @@
-import os
-import chromadb
-from chromadb.utils import embedding_functions
 from typing import List, Dict, Any, Optional
-
-# Constants
-CHROMA_DB_PATH = "rag/vector_database/chroma_db"
-DEFAULT_TOP_K = 3
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.schema import Document
+from langchain_core.prompts import ChatPromptTemplate
+import os
 
 class SchemaRAG:
-    """Class to handle retrieval and augmentation of schema information."""
-    
-    def __init__(self):
-        """Initialize the SchemaRAG with ChromaDB client."""
-        # Initialize ChromaDB client
-        self.client = None
-        self.collection = None
-        self.embedding_function = None
+    """
+    SchemaRAG: A Retrieval-Augmented Generation system for database schema context.
+    This class handles retrieving relevant database schema information based on user queries
+    and augmenting the prompt with this information for more accurate SQL generation.
+    """
+    def __init__(self, persist_directory: str = "rag/vectordb", 
+                 embeddings_model_name: str = "sentence-transformers/paraphrase-MiniLM-L3-v2",
+                 top_k: int = 3):
+        """
+        Initialize the SchemaRAG system.
         
-        # Initialize if DB exists
-        if os.path.exists(CHROMA_DB_PATH):
-            self._initialize_client()
-    
-    def _initialize_client(self):
-        """Initialize ChromaDB client and collection."""
+        Args:
+            persist_directory: Directory where the vector database is stored
+            embeddings_model_name: Name of the embedding model to use (using smaller model to save disk space)
+            top_k: Number of most relevant schema documents to retrieve
+        """
+        self.persist_directory = persist_directory
+        self.embeddings_model_name = embeddings_model_name
+        self.top_k = top_k
+        self.vectordb = None
+        self.embeddings = None
+        
+        # Try to initialize embeddings and vector database
         try:
-            self.client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-            
-            # Use SentenceTransformer for embeddings
-            self.embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
-                model_name="all-MiniLM-L6-v2"
-            )
-            
-            # Get collection
-            self.collection = self.client.get_collection(
-                name="schema_info", 
-                embedding_function=self.embedding_function
-            )
-            return True
+            self.embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
+            if os.path.exists(persist_directory):
+                self.vectordb = Chroma(persist_directory=persist_directory, embedding_function=self.embeddings)
+                print(f"Successfully connected to vector database at {persist_directory}")
+            else:
+                print(f"Vector database not found at {persist_directory}")
         except Exception as e:
-            print(f"Error initializing ChromaDB client: {e}")
-            return False
+            print(f"Failed to initialize SchemaRAG: {e}")
     
     def is_initialized(self) -> bool:
-        """Check if RAG is properly initialized."""
-        return self.client is not None and self.collection is not None
-    
-    def retrieve_schema_info(self, query: str, top_k: int = DEFAULT_TOP_K) -> List[Dict[str, Any]]:
         """
-        Retrieve the most relevant schema information based on the query.
+        Check if the RAG system is properly initialized with a vector database.
+        
+        Returns:
+            bool: True if initialized, False otherwise
+        """
+        return self.vectordb is not None
+        
+    def retrieve_relevant_schemas(self, query: str) -> List[Document]:
+        """
+        Retrieve schema documents relevant to the user query.
         
         Args:
-            query: The user query to find relevant schema information
-            top_k: Number of schema documents to retrieve
+            query: User's natural language query
             
         Returns:
-            List of schema information documents with metadata
+            List[Document]: List of relevant schema documents
         """
         if not self.is_initialized():
-            if not self._initialize_client():
-                # Failed to initialize
-                return []
-        
+            print("Vector database not initialized, cannot retrieve schemas")
+            return []
+            
         try:
-            # Query the collection
-            results = self.collection.query(
-                query_texts=[query],
-                n_results=top_k
-            )
-            
-            # Prepare results
-            schema_info = []
-            if results and results['documents']:
-                for i, doc in enumerate(results['documents'][0]):
-                    metadata = results['metadatas'][0][i] if results['metadatas'][0] else {}
-                    schema_info.append({
-                        'content': doc,
-                        'metadata': metadata,
-                        'score': results['distances'][0][i] if 'distances' in results and results['distances'][0] else None
-                    })
-            
-            return schema_info
+            # Perform similarity search to get relevant documents
+            documents = self.vectordb.similarity_search(query, k=self.top_k)
+            print(f"Retrieved {len(documents)} relevant documents for query: {query[:50]}...")
+            return documents
         except Exception as e:
-            print(f"Error retrieving schema information: {e}")
+            print(f"Error retrieving relevant schemas: {e}")
             return []
     
-    def augment_prompt_with_schema(self, query: str, top_k: int = DEFAULT_TOP_K) -> str:
+    def format_schema_context(self, documents: List[Document]) -> str:
         """
-        Augment the user query with schema information.
+        Format retrieved schema documents into a context string.
         
         Args:
-            query: The user query
-            top_k: Number of schema documents to retrieve
+            documents: List of retrieved schema documents
             
         Returns:
-            Augmented prompt with schema information
+            str: Formatted schema context
         """
-        schema_info = self.retrieve_schema_info(query, top_k)
+        if not documents:
+            return "No schema information available."
         
-        if not schema_info:
-            return query
+        context = "Database Schema Information:\n"
+        for i, doc in enumerate(documents):
+            context += f"--- Schema {i+1} ---\n{doc.page_content}\n\n"
         
-        # Format retrieved schema information
-        schema_context = "\n\n".join([doc['content'] for doc in schema_info])
-        
-        # Create augmented prompt
-        augmented_prompt = f"""
-I need to generate a SQL query for the following question: "{query}"
-
-Here is the relevant database schema information:
-
-{schema_context}
-
-Based on this schema information, generate a correct SQL query.
-""".strip()
-        
-        return augmented_prompt
+        return context.strip()
     
-    def get_table_info_for_rag(self, query: str, top_k: int = DEFAULT_TOP_K) -> str:
+    def augment_prompt(self, query: str, base_prompt_template: ChatPromptTemplate) -> ChatPromptTemplate:
         """
-        Get formatted table info for RAG pipeline (compatible with existing app).
+        Augment the base prompt template with schema context.
         
         Args:
-            query: The user query
-            top_k: Number of schema documents to retrieve
+            query: User's natural language query
+            base_prompt_template: Base prompt template to augment
             
         Returns:
-            Formatted table info for the LLM
+            ChatPromptTemplate: Augmented prompt template
         """
-        schema_info = self.retrieve_schema_info(query, top_k)
+        # Retrieve relevant schema documents
+        documents = self.retrieve_relevant_schemas(query)
         
-        if not schema_info:
+        # Format the schema context
+        schema_context = self.format_schema_context(documents)
+        
+        try:
+            # Create a new list of messages for the augmented template
+            new_messages = []
+            
+            # Get the original messages
+            original_messages = base_prompt_template.messages
+            
+            # Find the system message and augment it
+            system_message_found = False
+            for message in original_messages:
+                if hasattr(message, 'role') and message.role == 'system':
+                    # This is a system message, augment it
+                    system_prompt = message.prompt.template
+                    augmented_system_prompt = f"{system_prompt}\n\nRelevant Database Schema:\n{schema_context}"
+                    
+                    # Create a new system message with the augmented content
+                    from langchain.prompts.chat import SystemMessagePromptTemplate
+                    new_message = SystemMessagePromptTemplate.from_template(augmented_system_prompt)
+                    new_messages.append(new_message)
+                    system_message_found = True
+                else:
+                    # Keep other messages as they are
+                    new_messages.append(message)
+            
+            # If no system message was found, add one
+            if not system_message_found:
+                print("No system message found in base prompt, adding one with schema context")
+                from langchain.prompts.chat import SystemMessagePromptTemplate
+                new_message = SystemMessagePromptTemplate.from_template(f"You are a SQL expert. Consider the following database schema:\n\n{schema_context}")
+                new_messages.insert(0, new_message)
+            
+            # Create a new prompt template with the augmented messages
+            augmented_template = ChatPromptTemplate.from_messages(new_messages)
+            
+            return augmented_template
+        except Exception as e:
+            print(f"Error augmenting prompt: {e}")
+            return base_prompt_template  # Return the original prompt if there's an error
+    
+    def get_tables_from_documents(self, documents: List[Document]) -> List[str]:
+        """
+        Extract table names from retrieved documents.
+        
+        Args:
+            documents: List of retrieved schema documents
+            
+        Returns:
+            List[str]: List of table names
+        """
+        tables = []
+        for doc in documents:
+            # Extract table name from the document
+            try:
+                for line in doc.page_content.split('\n'):
+                    if line.startswith('Table:'):
+                        table_name = line.replace('Table:', '').strip()
+                        tables.append(table_name)
+                        break
+            except Exception as e:
+                print(f"Error extracting table name from document: {e}")
+        
+        return tables
+    
+    def get_relevant_tables(self, query: str) -> List[str]:
+        """
+        Get names of tables relevant to the query.
+        
+        Args:
+            query: User's natural language query
+            
+        Returns:
+            List[str]: List of relevant table names
+        """
+        documents = self.retrieve_relevant_schemas(query)
+        return self.get_tables_from_documents(documents)
+    
+    def get_table_info_for_rag(self, query: str) -> str:
+        """
+        Get formatted table information for the query to be used in the prompt.
+        This method is specifically used by app.py's run_sql_chain function.
+        
+        Args:
+            query: User's natural language query
+            
+        Returns:
+            str: Formatted table schema information
+        """
+        if not self.is_initialized():
+            print("Vector database not initialized, cannot get table info")
             return ""
+            
+        # Get relevant documents
+        documents = self.retrieve_relevant_schemas(query)
         
-        # Format retrieved schema information as table info
-        table_info_sections = []
+        if not documents:
+            print("No relevant documents found for query")
+            return ""
+            
+        try:
+            # Extract and format table information
+            table_info = []
+            for doc in documents:
+                table_info.append(doc.page_content)
+                
+            return "\n\n".join(table_info)
+        except Exception as e:
+            print(f"Error formatting table info: {e}")
+            return ""
+    
+    def process_query(self, query: str, base_prompt_template: ChatPromptTemplate) -> Dict[str, Any]:
+        """
+        Process a user query and return augmented prompt and relevant information.
         
-        for doc in schema_info:
-            # Parse the document content
-            content = doc['content']
-            table_info_sections.append(content)
+        Args:
+            query: User's natural language query
+            base_prompt_template: Base prompt template
+            
+        Returns:
+            Dict: Dictionary containing augmented prompt and relevant tables
+        """
+        # Retrieve relevant schema documents
+        documents = self.retrieve_relevant_schemas(query)
         
-        # Join all tables information
-        return "\n\n".join(table_info_sections)
+        # Format schema context
+        schema_context = self.format_schema_context(documents)
+        
+        # Get relevant table names
+        relevant_tables = self.get_tables_from_documents(documents)
+        
+        # Augment the prompt
+        augmented_prompt = self.augment_prompt(query, base_prompt_template)
+        
+        return {
+            "augmented_prompt": augmented_prompt,
+            "schema_context": schema_context,
+            "relevant_tables": relevant_tables,
+            "documents": documents
+        }

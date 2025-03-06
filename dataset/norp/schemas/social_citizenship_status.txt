@@ -1,0 +1,8 @@
+CREATE TABLE social_citizenship_status (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Foreign_Born_Population INT,
+    Naturalized_Us_Citizen INT,
+    Not_A_Us_Citizen INT
+); 

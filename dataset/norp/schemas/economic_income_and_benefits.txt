@@ -1,0 +1,8 @@
+CREATE TABLE economic_income_and_benefits (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Total_Households INT,
+    Median_Household_Income FLOAT,
+    Mean_Household_Income FLOAT
+); 

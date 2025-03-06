@@ -169,3 +169,8 @@ llm-engine/app/sensitive/openai.txt
 llm-engine/app/sensitive/openai.txt.gpg
 llm-engine/packages/
 llm-engine/pyproject.toml
+
+# Project-specific generated files
+local_norp.db
+rag/vectordb/*
+*.bin

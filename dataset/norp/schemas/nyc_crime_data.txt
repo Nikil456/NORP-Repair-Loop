@@ -1,0 +1,11 @@
+CREATE TABLE nyc_crime_data (
+    Crime_ID INT,
+    Report_Number VARCHAR(50),
+    Crime_Date DATE,
+    Crime_Time TIME,
+    Crime_Class VARCHAR(50),
+    Crime_Type VARCHAR(100),
+    Area_Name VARCHAR(100),
+    Latitude FLOAT,
+    Longitude FLOAT
+); 

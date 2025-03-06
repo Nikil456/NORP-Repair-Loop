@@ -1,56 +1,116 @@
-# RAG-based Schema Context for SQL Generation
+# Schema RAG for SQL Generation
 
-This module implements a Retrieval-Augmented Generation (RAG) pipeline to provide relevant database schema context for SQL query generation.
+This module implements Retrieval-Augmented Generation (RAG) to enhance SQL query generation by providing relevant schema context to the LLM.
 
 ## Overview
 
-The RAG pipeline provides the following benefits:
+The RAG system addresses a critical challenge in SQL generation: providing the model with just the relevant tables and schema information, rather than overwhelming it with the entire database schema. This becomes especially important in databases with hundreds of tables and relationships.
 
-1. **Selective Schema Context**: Instead of sending the entire database schema to the LLM, RAG retrieves only the most relevant tables based on the user's query, reducing token usage and improving SQL generation.
+## How It Works
 
-2. **Reduced Hallucination**: By providing accurate schema information, the LLM is less likely to hallucinate column or table names that don't exist.
+1. **Schema Vectorization**: For each table in the database, we create a textual document with:
+   - Table name
+   - Column names and types
+   - Relationships to other tables
+   - A natural language description of the table's purpose
 
-3. **Improved Query Accuracy**: The LLM receives detailed information about table structures and relationships, leading to more accurate SQL queries.
+2. **Vector Storage**: These textual documents are embedded using a language model (Sentence Transformers) and stored in a Chroma vector database.
 
-## Components
+3. **Retrieval**: When a user submits a query, we:
+   - Embed the query using the same model
+   - Perform a similarity search to find the most relevant table schemas
+   - Return only the top k most relevant schema documents
 
-The RAG implementation consists of the following components:
+4. **Prompt Augmentation**: The relevant schema information is added to the prompt sent to the LLM, providing focused context for SQL generation.
 
-1. **Vector Database Creation (`utils/create_vectordb.py`)**: 
-   - Creates a ChromaDB instance with embedded schema documents
-   - Each document represents a database table with its columns, types, relationships, and description
-   - Uses SentenceTransformer for embeddings
+## Setup
 
-2. **Retrieval and Augmentation (`rag/vector_database/rag.py`)**: 
-   - Handles retrieval of relevant schema information based on user queries
-   - Formats retrieved schema information for the LLM
-   - Integrates with the existing SQL generation pipeline
+### Option 1: Complete Setup (Recommended)
 
-## Usage
+The easiest way to set up the entire system, including the RAG component, is to use our comprehensive setup script:
 
-### Setup
+```bash
+# Make sure you're in the correct conda environment
+conda activate norp
 
-Before using the RAG pipeline, you need to create the vector database:
+# Run the setup script
+python utils/setup_from_scratch.py
+```
+
+This script will:
+- Clean any existing databases
+- Set up a new SQLite database
+- Ingest all data
+- Create the vector database for RAG
+- Run tests to verify everything works correctly
+
+### Option 2: Manual RAG Setup
+
+If you already have the database set up and only want to create the vector database:
 
 ```bash
 python utils/create_vectordb.py
 ```
 
-### API Usage
+This script:
+- Reads schema files from `dataset/norp/schemas`
+- Connects to the SQLite database to verify tables and get additional metadata
+- Creates vector embeddings for each table
+- Stores the embeddings in a Chroma database in the `rag/vectordb` directory
+
+## Usage in Code
+
+The `SchemaRAG` class provides methods to:
+
+1. Retrieve relevant schemas for a query:
+```python
+schema_rag = SchemaRAG()
+relevant_tables = schema_rag.get_relevant_tables("Show me all shootings in New York")
+```
+
+2. Get table information for a query:
+```python
+table_info = schema_rag.get_table_info_for_rag("Show me all shootings in New York")
+```
+
+3. Augment a prompt with schema context:
+```python
+base_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a SQL expert. Generate a SQL query for the following question."),
+    ("human", "{question}")
+])
+augmented_prompt = schema_rag.augment_prompt("Show me all shootings in New York", base_prompt)
+```
+
+## API Usage
 
 When making a query to the API, you can enable RAG by setting the `use_rag` flag:
 
 ```json
 {
   "session_id": "123",
-  "question": "Show me all shootings in Texas",
+  "message": "Show me all shootings in New York",
   "message_type": "human",
   "use_rag": true
 }
 ```
 
 When `use_rag` is enabled, the system will:
-1. Embed the user's query
-2. Retrieve the most relevant schema information
-3. Add this information to the context for the LLM
-4. Generate an SQL query based on the augmented context 
+
+1. Use the SchemaRAG component to retrieve relevant table schemas
+2. Include only those schemas in the context for the LLM
+3. Generate a more accurate SQL query based on the focused schema information
+
+## Benefits
+
+- **Reduced Prompt Size**: Only includes relevant tables, not the entire schema
+- **Improved Accuracy**: Reduces hallucination of non-existent columns/tables
+- **Better Performance**: LLM can focus on the relevant parts of the schema
+- **Scalability**: Works well even with very large database schemas
+
+## Implementation Details
+
+The implementation consists of two main components:
+
+1. `utils/create_vectordb.py`: Creates the vector database from schema files and the actual database
+2. `rag/rag.py`: Contains the SchemaRAG class that handles retrieval and prompt augmentation 

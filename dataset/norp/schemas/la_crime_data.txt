@@ -1,0 +1,15 @@
+CREATE TABLE la_crime_data (
+    Crime_ID INT,
+    Report_Number VARCHAR(50),
+    Date_Reported DATE,
+    Crime_Date DATE,
+    Crime_Time TIME,
+    Crime_Type VARCHAR(100),
+    Area_Name VARCHAR(100),
+    Vict_Age INT,
+    Vict_Sex CHAR(1),
+    Weapon_Desc VARCHAR(100),
+    Address TEXT,
+    Latitude FLOAT,
+    Longitude FLOAT
+); 

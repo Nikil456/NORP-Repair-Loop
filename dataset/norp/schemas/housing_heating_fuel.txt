@@ -1,0 +1,15 @@
+CREATE TABLE housing_heating_fuel (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Total_Heating_Units INT,
+    Utility_Gas INT,
+    Bottled_Tank_Or_Lp_Gas INT,
+    Electricity INT,
+    Fuel_Oil_Kerosene INT,
+    Coal_Or_Coke INT,
+    Wood INT,
+    Solar_Energy INT,
+    Other_Fuel INT,
+    No_Fuel_Used INT
+); 

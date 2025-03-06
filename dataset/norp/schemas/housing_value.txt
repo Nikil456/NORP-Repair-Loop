@@ -1,0 +1,8 @@
+CREATE TABLE housing_value (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Number_Of_Units INT,
+    House_Value_Min INT,
+    House_Value_Max INT
+); 

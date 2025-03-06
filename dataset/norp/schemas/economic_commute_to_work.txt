@@ -1,0 +1,13 @@
+CREATE TABLE economic_commute_to_work (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Total_Workers INT,
+    Car_Alone INT,
+    Car_Pool INT,
+    Public_Transport INT,
+    Walk INT,
+    Other INT,
+    Work_From_Home INT,
+    Mean_Travel_Time FLOAT
+); 

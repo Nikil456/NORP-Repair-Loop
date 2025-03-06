@@ -1,0 +1,8 @@
+CREATE TABLE housing_year_built (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Number_Of_Units INT,
+    Year_Built_Min INT,
+    Year_Built_Max INT
+); 

@@ -5,7 +5,29 @@ This is easy to pretty print the results and testing.
 import requests
 import json
 import argparse
-from util import pretty_print_results
+
+# Define pretty_print_results function directly in this file instead of importing it
+def pretty_print_results(response_data):
+    """
+    Pretty print the response data from the API.
+    
+    Args:
+        response_data: The JSON response from the API
+    """
+    print("\n--- RESPONSE ---")
+    if "sql_query" in response_data and response_data["sql_query"]:
+        print("\nSQL Query:")
+        print(response_data["sql_query"])
+    
+    if "query_result" in response_data and response_data["query_result"]:
+        print("\nQuery Result:")
+        print(response_data["query_result"])
+    
+    if "response" in response_data:
+        print("\nLLM Response:")
+        print(response_data["response"])
+    
+    print("\n--------------\n")
 
 def run_query(question, session_id):
     url = "http://127.0.0.1:8000/query"

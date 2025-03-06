@@ -1,0 +1,7 @@
+CREATE TABLE housing_mortgage (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Units_With_Mortgage INT,
+    Units_Without_Mortgage INT
+); 

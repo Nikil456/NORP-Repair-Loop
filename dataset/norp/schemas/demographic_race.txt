@@ -1,0 +1,17 @@
+CREATE TABLE demographic_race (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Race_Total_Population INT,
+    One_Race INT,
+    Two_Or_More_Races INT,
+    White INT,
+    Black INT,
+    American_Indian_And_Alaska_Native INT,
+    Asian INT,
+    Native_Hawaiian_And_Other_Pacific_Islander INT,
+    Some_Other_Race INT,
+    Hispanic_Or_Latino_Total INT,
+    Hispanic_Or_Latino INT,
+    Not_Hispanic_Or_Latino INT
+); 

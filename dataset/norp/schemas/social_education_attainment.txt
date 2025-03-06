@@ -1,0 +1,15 @@
+CREATE TABLE social_education_attainment (
+    Year INT,
+    ID VARCHAR(100),
+    Zipcode VARCHAR(20),
+    Population_25_Years_And_Over INT,
+    Less_Than_9th_Grade INT,
+    No_Diploma_9th_To_12th_Grade INT,
+    High_School_Graduate INT,
+    Some_College_No_Degree INT,
+    Associate_Degree INT,
+    Bachelors_Degree INT,
+    Graduate_Or_Professional_Degree INT,
+    High_School_Graduate_Or_Higher INT,
+    Bachelors_Degree_Or_Higher INT
+); 
