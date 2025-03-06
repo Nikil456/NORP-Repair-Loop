@@ -174,5 +174,24 @@ python test_responses.py --question "For each month, get count of victims killed
 in the correct details for the database username and password.
 3. Run the app using `uvicorn app:app --reload --host 127.0.0.1 --port 8000`
 4. Use `test_responses.py` script to see the results.
+
+## Troubleshooting
+
+### Date Parsing Error
+
+When running the application, you may encounter the following error in the logs:
+```
+fromisoformat: argument must be str
+```
+
+This error is related to date parsing in the application. Despite this error message, the application is still functional and can successfully retrieve and process data from the database. The error occurs when:
+
+1. A POST request is made to the `/query` endpoint
+2. The application processes the request and performs RAG operations
+
+**Workaround**: You can safely ignore this error as it doesn't prevent the application from functioning correctly. The API will still return valid responses to your queries.
+
+If you're developing or extending this application, you may want to investigate the date parsing code to properly handle the format of timestamps being processed.
+
 ---
 
