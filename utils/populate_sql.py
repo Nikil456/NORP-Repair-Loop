@@ -2,12 +2,21 @@
 import os
 import json
 import csv
-import sqlite3
-from sqlalchemy import create_engine, text
+import mysql.connector
+from mysql.connector import errorcode
+from sqlalchemy import create_engine, text, exc
 import pandas as pd
 import re
 import argparse
 from pathlib import Path
+import time
+import numpy as np
+import glob
+import sys
+
+# Add the project root to the Python path to ensure imports work
+sys.path.insert(0, os.path.abspath(os.path.dirname(os.path.dirname(__file__))))
+from utils.column_utils import clean_column_name, clean_dataframe_columns
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -32,9 +41,45 @@ def get_create_table_statements():
             table_name = os.path.splitext(schema_file)[0]
             with open(os.path.join(schemas_dir, schema_file), 'r') as f:
                 create_statement = f.read().strip()
+                # Convert SQLite statements to MySQL format
+                create_statement = convert_sqlite_to_mysql(create_statement)
                 create_statements[table_name] = create_statement
     
     return create_statements
+
+def convert_sqlite_to_mysql(create_statement):
+    """Convert SQLite CREATE TABLE statement to MySQL format."""
+    # Replace INTEGER PRIMARY KEY with INT AUTO_INCREMENT PRIMARY KEY
+    create_statement = re.sub(r'INTEGER\s+PRIMARY\s+KEY', 'INT AUTO_INCREMENT PRIMARY KEY', create_statement, flags=re.IGNORECASE)
+    
+    # Replace AUTOINCREMENT with AUTO_INCREMENT
+    create_statement = re.sub(r'AUTOINCREMENT', 'AUTO_INCREMENT', create_statement, flags=re.IGNORECASE)
+    
+    # Replace double quotes with backticks for column names
+    create_statement = re.sub(r'"([^"]+)"', r'`\1`', create_statement)
+    
+    # Replace single quotes with backticks for column names (if they're not string literals)
+    # This is tricky, so we'll use a simple approach that may miss some cases
+    if 'CREATE TABLE' in create_statement:
+        parts = create_statement.split('(', 1)
+        if len(parts) > 1:
+            # Handle the table name
+            table_part = parts[0]
+            table_part = re.sub(r"'([^']+)'", r'`\1`', table_part)
+            
+            # Don't replace quotes in the columns part to avoid affecting string literals
+            create_statement = table_part + '(' + parts[1]
+    
+    # Replace TEXT with LONGTEXT for potentially large text fields
+    create_statement = re.sub(r'\bTEXT\b', 'LONGTEXT', create_statement, flags=re.IGNORECASE)
+    
+    # Replace REAL with DOUBLE
+    create_statement = re.sub(r'\bREAL\b', 'DOUBLE', create_statement, flags=re.IGNORECASE)
+    
+    # Replace BLOB with LONGBLOB
+    create_statement = re.sub(r'\bBLOB\b', 'LONGBLOB', create_statement, flags=re.IGNORECASE)
+    
+    return create_statement
 
 def get_csv_files():
     """Get all CSV files in the dataset directory."""
@@ -49,20 +94,21 @@ def get_csv_files():
     return csv_files
 
 def clean_column_names(df):
-    """Clean column names to match SQL schema format."""
-    # Replace spaces with underscores
-    df.columns = [col.replace(' ', '_') for col in df.columns]
+    """Clean column names to match SQL schema format.
     
-    # Replace special characters that cause issues
-    df.columns = [col.replace('#', 'Number') for col in df.columns]
-    df.columns = [col.replace('-', '_') for col in df.columns]
-    df.columns = [col.replace('&', 'And') for col in df.columns]
-    df.columns = [col.replace('%', 'Percent') for col in df.columns]
-    df.columns = [col.replace('(', '') for col in df.columns]
-    df.columns = [col.replace(')', '') for col in df.columns]
-    df.columns = [col.replace('.', '') for col in df.columns]
+    DEPRECATED: Use clean_dataframe_columns from column_utils instead.
+    This is kept for backward compatibility.
+    """
+    return clean_dataframe_columns(df)
+
+def clean_column_name(column_name):
+    """Clean a single column name to match SQL schema format.
     
-    return df
+    DEPRECATED: Use clean_column_name from column_utils instead.
+    This is kept for backward compatibility.
+    """
+    from utils.column_utils import clean_column_name as new_clean_column_name
+    return new_clean_column_name(column_name)
 
 def extract_column_names_from_schema(create_statement):
     """Extract column names from CREATE TABLE statement."""
@@ -150,6 +196,9 @@ def process_table(conn, table_name, create_statement, csv_path):
                 if len(schema_columns) > 0 and len(df.columns) == len(schema_columns):
                     df.columns = schema_columns
                 
+                # Replace NaN values with NULL for MySQL compatibility
+                df = df.where(pd.notnull(df), None)
+                
                 # For large files, import in chunks
                 file_size = os.path.getsize(csv_path)
                 
@@ -163,11 +212,19 @@ def process_table(conn, table_name, create_statement, csv_path):
                         if len(schema_columns) > 0 and len(chunk.columns) == len(schema_columns):
                             chunk.columns = schema_columns
                         
+                        # Replace NaN values with NULL
+                        chunk = chunk.where(pd.notnull(chunk), None)
+                        
                         if i == 0:
                             # Print first few column names for debugging
                             print(f"  CSV columns: {list(chunk.columns)[:5]}...")
-                            
-                        chunk.to_sql(table_name, conn, if_exists='append', index=False)
+                        
+                        # For MySQL, use appropriate if_exists mode
+                        if i == 0:
+                            chunk.to_sql(table_name, conn, if_exists='replace', index=False)
+                        else:
+                            chunk.to_sql(table_name, conn, if_exists='append', index=False)
+                        
                         print(f"  Imported chunk {i+1} of {table_name}")
                 else:
                     # Print first few column names for debugging
@@ -177,29 +234,55 @@ def process_table(conn, table_name, create_statement, csv_path):
                 print(f"Successfully populated {table_name}")
             except Exception as e:
                 print(f"Error populating {table_name}: {str(e)}")
-                # Try direct SQLite approach for problematic tables
+                
+                # Try direct MySQL approach for problematic tables
                 try:
-                    print(f"  Trying direct SQLite import for {table_name}")
-                    # Get SQLite connection from engine
-                    sqlite_conn = conn.connection
-                    cursor = sqlite_conn.cursor()
+                    print(f"  Trying direct MySQL import for {table_name}")
                     
-                    # Drop table if it exists, then create it again
+                    # Get MySQL connection from SQLAlchemy engine
+                    # Note: This approach depends on how your engine was created
+                    # and may need adjustment
+                    config = load_config()
+                    db_url = config['db_url']
+                    db_name = db_url.split('/')[-1]
+                    host = db_url.split('@')[1].split('/')[0]
+                    if ':' in host:
+                        host = host.split(':')[0]
+                    
+                    # Create raw MySQL connection
+                    mysql_conn = mysql.connector.connect(
+                        user=config['db_username'],
+                        password=config['db_password'],
+                        host=host,
+                        database=db_name
+                    )
+                    cursor = mysql_conn.cursor()
+                    
+                    # Recreate the table
                     cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
                     cursor.execute(create_statement)
-                    sqlite_conn.commit()
+                    mysql_conn.commit()
                     
-                    # Import CSV directly using SQLite's import
+                    # Import CSV using LOAD DATA INFILE if possible
+                    # This requires the file to be accessible to the MySQL server
+                    # If this is not possible, fall back to regular inserts
+                    
+                    # Read the CSV file
                     with open(csv_path, 'r') as f:
                         reader = csv.reader(f)
                         header = next(reader)  # Skip header
                         
+                        # Clean the header names
+                        header = [col.replace(' ', '_') for col in header]
+                        header = [col.replace('#', '_Number') for col in header]
+                        header = [col.replace('-', '_') for col in header]
+                        
                         # Create SQL insert command with placeholders
-                        placeholders = ', '.join(['?' for _ in range(len(schema_columns))])
-                        insert_sql = f"INSERT INTO {table_name} VALUES ({placeholders})"
+                        placeholders = ', '.join(['%s' for _ in range(len(header))])
+                        insert_sql = f"INSERT INTO {table_name} ({', '.join([f'`{col}`' for col in header])}) VALUES ({placeholders})"
                         
                         # Batch insert in chunks
-                        batch_size = 5000
+                        batch_size = 1000  # Smaller batch size for MySQL
                         batch = []
                         
                         for i, row in enumerate(reader):
@@ -207,17 +290,19 @@ def process_table(conn, table_name, create_statement, csv_path):
                             
                             if len(batch) >= batch_size:
                                 cursor.executemany(insert_sql, batch)
-                                sqlite_conn.commit()
+                                mysql_conn.commit()
                                 print(f"  Imported {len(batch)} rows")
                                 batch = []
                         
                         # Insert any remaining rows
                         if batch:
                             cursor.executemany(insert_sql, batch)
-                            sqlite_conn.commit()
+                            mysql_conn.commit()
                             print(f"  Imported {len(batch)} remaining rows")
                     
-                    print(f"Successfully populated {table_name} using direct SQLite import")
+                    cursor.close()
+                    mysql_conn.close()
+                    print(f"Successfully populated {table_name} using direct MySQL import")
                 except Exception as inner_e:
                     print(f"  Direct import also failed: {str(inner_e)}")
         else:
@@ -233,10 +318,14 @@ def main():
     config = load_config()
     db_url = config['db_url']
     
-    # Ensure database directory exists
-    ensure_db_dir_exists(db_url)
+    # Extract database name from URL
+    db_name = db_url.split('/')[-1]
     
-    # Create database engine
+    # Ensure database exists if using SQLite (legacy support)
+    if db_url.startswith('sqlite:///'):
+        ensure_db_dir_exists(db_url)
+    
+    # Create database engine with the specified database
     engine = create_engine(db_url)
     
     # Get schema statements and CSV files
@@ -250,19 +339,22 @@ def main():
             if args.table in create_statements:
                 if args.drop_tables:
                     drop_table(conn, args.table)
-                csv_path = csv_files.get(args.table)
-                process_table(conn, args.table, create_statements[args.table], csv_path)
+                process_table(conn, args.table, create_statements[args.table], 
+                             csv_files.get(args.table))
             else:
-                print(f"Error: Table '{args.table}' not found in schema files")
+                print(f"Table {args.table} not found in schema files.")
+                return 1
         else:
             # Process all tables
             for table_name, create_statement in create_statements.items():
                 if args.drop_tables:
                     drop_table(conn, table_name)
-                csv_path = csv_files.get(table_name)
-                process_table(conn, table_name, create_statement, csv_path)
+                process_table(conn, table_name, create_statement, 
+                             csv_files.get(table_name))
     
-    print("Database setup complete!")
+    print(f"Database population complete for {db_name}")
+    return 0
 
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.exit(main())

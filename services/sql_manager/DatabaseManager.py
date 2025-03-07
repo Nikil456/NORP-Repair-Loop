@@ -1,14 +1,14 @@
 from langchain_community.utilities import SQLDatabase
 
 class DatabaseManager:
-    def __init__(self, uri="sqlite:///Chinook.db"):
+    def __init__(self, uri="mysql+mysqlconnector://root:password@localhost/norp_db"):
         """
         Initialize the database connection.
 
         Args:
             uri (str): The uri of the database.
         """
-        # Initialize the SQLite database connection
+        # Initialize the MySQL database connection
         self.db = SQLDatabase.from_uri(uri)
 
     def execute(self, query):
