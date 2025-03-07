@@ -1,0 +1,27 @@
+{
+  "metrics": {
+    "total_queries": 1,
+    "api_success_count": 0,
+    "api_success_rate": 0.0,
+    "syntactically_correct_count": 0,
+    "syntactical_correctness": 0.0,
+    "logically_correct_count": 0,
+    "logical_correctness": 0.0,
+    "logical_of_syntactical": 0,
+    "syntax_errors": {}
+  },
+  "details": [
+    {
+      "nl_query": "For each zipcode in Atlanta, give the change in average house rent from 2019 to 2022, i.e., from pre-COVID to post-COVID period.",
+      "gold_sql": "select substring(housing_rent.zipcode, 7, 10) as zcta, cast((sum(number_of_units*((rent_value_min+rent_value_max)/2))/sum(number_of_units)) - h.rent_weighted_avg as decimal(8,2)) as rent_change\nfrom housing_rent join \n(select zipcode, (sum(number_of_units*((rent_value_min+rent_value_max)/2))/sum(number_of_units)) as rent_weighted_avg\nfrom housing_rent where year=2019 group by zipcode) as h on h.zipcode=housing_rent.zipcode\nwhere year=2022 \ngroup by housing_rent.zipcode",
+      "generated_sql": null,
+      "api_success": false,
+      "api_error": "API connection error",
+      "syntactically_correct": false,
+      "logically_correct": false,
+      "gold_execution_success": false,
+      "generated_execution_success": false,
+      "error_message": "API connection error"
+    }
+  ]
+}
