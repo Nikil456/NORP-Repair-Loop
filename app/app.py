@@ -23,6 +23,7 @@ from langchain_core.prompt_values import ChatPromptValue
 from langchain_core.runnables.base import RunnableLambda
 from utils.constants import *
 from config.prompts import *
+from auto_correction.auto_correction import AutoCorrection
 
 # Import RAG if available
 try:
@@ -110,6 +111,7 @@ def run_sql_chain(question: str, history: List[dict], session_id: str, memory: C
         # Get relevant table info using RAG
         if schema_rag.is_initialized():
             table_info = schema_rag.get_table_info_for_rag(question)
+            print(f"RAG table_info: {table_info}")
             if not table_info:  # Fallback to complete table info if RAG returns nothing
                 table_info = db.get_table_info()
         else:
@@ -123,25 +125,27 @@ def run_sql_chain(question: str, history: List[dict], session_id: str, memory: C
     messages = []
     
     if not history:
+        print(f"wihout table_info: {table_info}")
         # For initial prompt (no history)
         initial_prompt_value = INITIAL_PROMPT.invoke({
             "table_info": table_info,
             "top_k": TOP_K_ROWS  
         })
         continuation_prompt_value = CONTINUATION_PROMPT.invoke({
-            "question": question,
+            "question": f"Here is the table info ONLY use table names specified after Table: and column names specified after Column: in your SQL query: {table_info}\n\n{question}",
             "history": []
         })
         messages.extend(initial_prompt_value.messages)
         messages.extend(continuation_prompt_value.messages)
     else:
-        # For continuation prompt (with history)
+        print(f"with table_info: {table_info}")
+        # For continuation prompt (with history)˜†
         continuation_prompt_value = CONTINUATION_PROMPT.invoke({
-            "question": question,
+            "question": f"Here is the table info ONLY use table names specified after Table: and column names specified after Column: in your SQL query: {table_info}\n\n{question}",
             "history": history
         })
         messages.extend(continuation_prompt_value.messages)
-
+    print(f"messages: {messages}")
     # Ensure all messages are of type BaseMessage with correct types
     formatted_messages = []
     for msg in messages:
@@ -195,10 +199,11 @@ def run_sql_chain(question: str, history: List[dict], session_id: str, memory: C
 
 # Define the request body model using Pydantic
 class ChatRequest(BaseModel):
-    session_id: Union[int, str]  # Accept either int or str for session_id
+    session_id: Union[int, str]
     message: str
     message_type: str
-    use_rag: bool = False  # Optional flag to enable RAG, defaults to False
+    use_rag: bool = False  # Optional flag to enable RAG
+    use_auto_correction: bool = True  # Optional flag to enable auto-correction, defaults to True
 
 class ChatResponse(BaseModel):
     session_id: str
@@ -300,13 +305,20 @@ async def handle_query(request: Request):
         session_id=json_data["session_id"],
         message=json_data["question"],
         message_type=json_data["message_type"],
-        use_rag=json_data.get("use_rag", False)  # Get use_rag flag with default value
+        use_rag=json_data.get("use_rag", False),
+        use_auto_correction=json_data.get("use_auto_correction", True)
     )
+    
     if not chat_request.message:
         raise HTTPException(status_code=400, detail="No question provided")
+    
     sql_query = None
     query_results = None 
     memory = get_message_history(chat_request.session_id)
+    
+    # Initialize auto-correction if enabled
+    auto_correction = AutoCorrection(llm, execute_sql_query) if chat_request.use_auto_correction else None
+    
     # Invoke the chain with the question
     try:
         sql_query, memory = run_sql_chain(
@@ -314,22 +326,50 @@ async def handle_query(request: Request):
             memory.load_memory_variables({})["history"],
             chat_request.session_id,
             memory,
-            chat_request.use_rag  # Pass the use_rag flag to the chain
+            chat_request.use_rag
         )
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
+    
     content = sql_query.content
     if content.startswith('```sql') and content.endswith('```'):
-        sql_query = content[6:-3].strip()  # Remove the markdown ```sql and ```
+        sql_query = content[6:-3].strip()
     else:
         sql_query = content.strip()
     
-    query_results = execute_sql_query(
-        sql_query
-    )
-
-    return {"sql_query": sql_query, "query_results": query_results}
+    try:
+        if chat_request.use_auto_correction:
+            # Try to execute the query with auto-correction
+            corrected_query, correction_explanation, correction_metadata = await auto_correction.correct_query(
+                sql_query,
+                "",  # No initial error message
+                chat_request.message
+            )
+            
+            # Execute the final query
+            query_results = execute_sql_query(corrected_query)
+            
+            # Update the response with correction information
+            return {
+                "sql_query": corrected_query,
+                "query_results": query_results,
+                "correction_explanation": correction_explanation,
+                "correction_metadata": correction_metadata,
+                "auto_correction_used": True
+            }
+        else:
+            # Execute query without auto-correction
+            query_results = execute_sql_query(sql_query)
+            return {
+                "sql_query": sql_query,
+                "query_results": query_results,
+                "auto_correction_used": False
+            }
+            
+    except Exception as e:
+        print(f"Error executing query: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

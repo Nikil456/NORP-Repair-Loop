@@ -208,9 +208,10 @@ class SchemaRAG:
         try:
             # Extract and format table information
             table_info = []
+            print(f"rag documents: {documents}")
             for doc in documents:
                 table_info.append(doc.page_content)
-                
+            print(f"inside rag table_info: {table_info}")
             return "\n\n".join(table_info)
         except Exception as e:
             print(f"Error formatting table info: {e}")

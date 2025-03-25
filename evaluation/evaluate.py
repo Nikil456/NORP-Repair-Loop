@@ -33,7 +33,7 @@ from test_gold_queries import connect_to_mysql, test_query, get_all_tables
 
 # Constants
 MAX_WORKERS = 4  # For parallel execution
-API_BASE_URL = "http://localhost:8088"  # Default API URL
+API_BASE_URL = "http://localhost:8087"  # Default API URL
 MAX_RETRIES = 3  # Maximum number of retries for API requests
 RETRY_DELAY = 2  # Delay between retries in seconds
 
@@ -64,6 +64,7 @@ def parse_args():
     parser.add_argument("--compare-rag", action="store_true", help="Compare RAG vs non-RAG performance")
     parser.add_argument("--only-rag", action="store_true", help="Only run evaluation with RAG")
     parser.add_argument("--only-no-rag", action="store_true", help="Only run evaluation without RAG")
+    parser.add_argument("--compare-auto-correction", action="store_true", help="Compare auto-correction performance (only with RAG)")
     parser.add_argument("--start-idx", type=int, default=0, help="Start evaluation from this index")
     parser.add_argument("--max-retries", type=int, default=MAX_RETRIES, help="Maximum number of API request retries")
     parser.add_argument("--retry-delay", type=int, default=RETRY_DELAY, help="Delay between retries in seconds")
@@ -152,7 +153,7 @@ def compare_query_results(results1, results2):
         records2 = [tuple(sorted(r.items())) for r in results2]
         return set(records1) == set(records2)
 
-def get_sql_from_api(api_url, question, use_rag=False, timeout=30, max_retries=MAX_RETRIES, retry_delay=RETRY_DELAY):
+def get_sql_from_api(api_url, question, use_rag=False, use_auto_correction=False, timeout=120, max_retries=MAX_RETRIES, retry_delay=RETRY_DELAY):
     """
     Send a natural language question to the API and get the generated SQL query
     Returns (success, message, sql_query)
@@ -160,7 +161,7 @@ def get_sql_from_api(api_url, question, use_rag=False, timeout=30, max_retries=M
     # Create a unique session ID for this request
     session_id = f"eval_{int(time.time())}_{hash(question) % 10000}"
     
-    logger.info(f"Sending API request for query: '{question[:50]}...' (RAG: {use_rag})")
+    logger.info(f"Sending API request for query: '{question[:50]}...' (RAG: {use_rag}, Auto-correction: {use_auto_correction})")
     
     # Prepare the API request
     url = f"{api_url}/query"
@@ -168,7 +169,8 @@ def get_sql_from_api(api_url, question, use_rag=False, timeout=30, max_retries=M
         "session_id": session_id,
         "question": question,
         "message_type": "question",
-        "use_rag": use_rag
+        "use_rag": use_rag,
+        "use_auto_correction": use_auto_correction
     }
     
     # Try with retries
@@ -225,7 +227,7 @@ def get_sql_from_api(api_url, question, use_rag=False, timeout=30, max_retries=M
     # If we reach here, all retries failed
     return False, "All API request attempts failed", None
 
-def evaluate_query(row, connection, all_db_tables, api_url, timeout, verbose, use_rag=False, max_retries=MAX_RETRIES, retry_delay=RETRY_DELAY):
+def evaluate_query(row, connection, all_db_tables, api_url, timeout, verbose, use_rag=False, use_auto_correction=False, max_retries=MAX_RETRIES, retry_delay=RETRY_DELAY):
     """Evaluate a single query from the dataset"""
     try:
         # Extract data
@@ -241,7 +243,7 @@ def evaluate_query(row, connection, all_db_tables, api_url, timeout, verbose, us
         
         # Get SQL query from API
         api_success, api_message, generated_sql = get_sql_from_api(
-            api_url, nl_query, use_rag, timeout, max_retries, retry_delay
+            api_url, nl_query, use_rag, use_auto_correction, timeout, max_retries, retry_delay
         )
         
         if not api_success:
@@ -259,7 +261,9 @@ def evaluate_query(row, connection, all_db_tables, api_url, timeout, verbose, us
                 "logically_correct": False,
                 "gold_execution_success": False,
                 "generated_execution_success": False,
-                "error_message": api_message
+                "error_message": api_message,
+                "use_rag": use_rag,
+                "use_auto_correction": use_auto_correction
             }
         
         # Clean the queries
@@ -282,7 +286,9 @@ def evaluate_query(row, connection, all_db_tables, api_url, timeout, verbose, us
                 "logically_correct": False,
                 "gold_execution_success": False,
                 "generated_execution_success": False,
-                "error_message": syntax_message
+                "error_message": syntax_message,
+                "use_rag": use_rag,
+                "use_auto_correction": use_auto_correction
             }
         
         # Execute both queries to test logical correctness
@@ -304,7 +310,9 @@ def evaluate_query(row, connection, all_db_tables, api_url, timeout, verbose, us
             "gold_execution_success": gold_exec_success,
             "generated_execution_success": gen_exec_success,
             "gold_error": "" if gold_exec_success else gold_exec_message,
-            "generated_error": "" if gen_exec_success else gen_exec_message
+            "generated_error": "" if gen_exec_success else gen_exec_message,
+            "use_rag": use_rag,
+            "use_auto_correction": use_auto_correction
         }
     
     except Exception as e:
@@ -318,7 +326,9 @@ def evaluate_query(row, connection, all_db_tables, api_url, timeout, verbose, us
             "api_success": api_success if 'api_success' in locals() else False,
             "syntactically_correct": False,
             "logically_correct": False,
-            "error_message": str(e)
+            "error_message": str(e),
+            "use_rag": use_rag,
+            "use_auto_correction": use_auto_correction
         }
 
 def format_metrics_table(metrics, title=None):
@@ -345,49 +355,63 @@ def format_metrics_table(metrics, title=None):
     # Format as a nice table
     return tabulate(table_data, headers=["Metric", "Value"], tablefmt="grid")
 
-def format_comparison_table(metrics_no_rag, metrics_rag):
-    """Format a comparison table between RAG and non-RAG results"""
+def format_comparison_table(metrics_no_rag=None, metrics_rag=None, metrics_rag_auto=None):
+    """Format a comparison table between RAG and non-RAG results, optionally including auto-correction"""
     table_data = []
     
     # Add header
-    table_data.append(["Metric", "No RAG", "RAG", "Difference"])
+    if metrics_rag_auto:
+        table_data.append(["Metric", "No RAG", "RAG", "RAG+Auto", "RAG Diff", "Auto Diff"])
+    else:
+        table_data.append(["Metric", "No RAG", "RAG", "Difference"])
     
     # Add main metrics with comparison
-    api_diff = metrics_rag['api_success_rate'] - metrics_no_rag['api_success_rate']
-    syntax_diff = metrics_rag['syntactical_correctness'] - metrics_no_rag['syntactical_correctness']
-    logic_diff = metrics_rag['logical_correctness'] - metrics_no_rag['logical_correctness']
-    logic_of_syntax_diff = metrics_rag['logical_of_syntactical'] - metrics_no_rag['logical_of_syntactical']
+    metrics = [
+        ("API Success Rate", 'api_success_rate'),
+        ("Syntactical Correctness", 'syntactical_correctness'),
+        ("Logical Correctness", 'logical_correctness'),
+        ("Logical Correctness (of Syntactical)", 'logical_of_syntactical')
+    ]
     
-    table_data.append([
-        "API Success Rate", 
-        f"{metrics_no_rag['api_success_rate']:.2f}%", 
-        f"{metrics_rag['api_success_rate']:.2f}%",
-        f"{api_diff:+.2f}%"
-    ])
-    
-    table_data.append([
-        "Syntactical Correctness", 
-        f"{metrics_no_rag['syntactical_correctness']:.2f}%", 
-        f"{metrics_rag['syntactical_correctness']:.2f}%",
-        f"{syntax_diff:+.2f}%"
-    ])
-    
-    table_data.append([
-        "Logical Correctness", 
-        f"{metrics_no_rag['logical_correctness']:.2f}%", 
-        f"{metrics_rag['logical_correctness']:.2f}%",
-        f"{logic_diff:+.2f}%"
-    ])
-    
-    table_data.append([
-        "Logical Correctness (of Syntactical)", 
-        f"{metrics_no_rag['logical_of_syntactical']:.2f}%", 
-        f"{metrics_rag['logical_of_syntactical']:.2f}%",
-        f"{logic_of_syntax_diff:+.2f}%"
-    ])
+    for metric_name, metric_key in metrics:
+        row = [metric_name]
+        
+        # No RAG value
+        if metrics_no_rag:
+            row.append(f"{metrics_no_rag[metric_key]:.2f}%")
+        else:
+            row.append("N/A")
+        
+        # RAG value
+        if metrics_rag:
+            row.append(f"{metrics_rag[metric_key]:.2f}%")
+            # RAG diff from No RAG
+            if metrics_no_rag:
+                diff = metrics_rag[metric_key] - metrics_no_rag[metric_key]
+                row.append(f"{diff:+.2f}%")
+        else:
+            row.append("N/A")
+            row.append("N/A")
+        
+        # Auto-correction comparison if available
+        if metrics_rag_auto:
+            row[-1] = f"{metrics_rag[metric_key]:.2f}%"  # Replace RAG value
+            row.append(f"{metrics_rag_auto[metric_key]:.2f}%")  # Add RAG+Auto value
+            
+            # Add diffs
+            if metrics_no_rag:
+                rag_diff = metrics_rag[metric_key] - metrics_no_rag[metric_key]
+                row.append(f"{rag_diff:+.2f}%")
+            else:
+                row.append("N/A")
+            
+            auto_diff = metrics_rag_auto[metric_key] - metrics_rag[metric_key]
+            row.append(f"{auto_diff:+.2f}%")
+        
+        table_data.append(row)
     
     # Format as a nice table
-    return tabulate(table_data, tablefmt="grid")
+    return tabulate(table_data, headers="firstrow", tablefmt="grid")
 
 def format_error_table(error_counts, title=None):
     """Format error data as a nice table"""
@@ -443,20 +467,22 @@ def calculate_metrics(results):
         'syntax_errors': syntax_errors
     }
 
-def save_checkpoint(checkpoint_file, current_index, results_no_rag, results_rag, args):
+def save_checkpoint(checkpoint_file, current_index, results_no_rag, results_rag, results_rag_auto, args):
     """Save checkpoint to resume from this point later"""
     try:
         checkpoint_data = {
             'current_index': current_index,
             'results_no_rag': results_no_rag,
             'results_rag': results_rag,
+            'results_rag_auto': results_rag_auto,
             'args': {
                 'dataset': args.dataset,
                 'api_url': args.api_url,
                 'timeout': args.timeout,
                 'compare_rag': args.compare_rag,
                 'only_rag': args.only_rag,
-                'only_no_rag': args.only_no_rag
+                'only_no_rag': args.only_no_rag,
+                'compare_auto_correction': args.compare_auto_correction
             }
         }
         with open(checkpoint_file, 'w') as f:
@@ -477,11 +503,15 @@ def load_checkpoint(checkpoint_file):
         logger.error(f"Error loading checkpoint: {str(e)}")
         return None
 
-def run_evaluation(df, connection, all_db_tables, args, use_rag=False, start_idx=0, existing_results=None):
-    """Run evaluation on the dataset with the specified RAG setting"""
+def run_evaluation(df, connection, all_db_tables, args, use_rag=True, use_auto_correction=False, start_idx=0, existing_results=None):
+    """Run evaluation on the dataset with the specified RAG and auto-correction settings"""
+    use_rag = True
+    use_auto_correction = True
     rag_status = "RAG" if use_rag else "No RAG"
+    
+    auto_correction_status = "with Auto-correction" if use_auto_correction else "without Auto-correction"
     logger.info(f"\n{'='*80}")
-    logger.info(f"Starting evaluation with {rag_status} from index {start_idx}...")
+    logger.info(f"Starting evaluation {rag_status} {auto_correction_status} from index {start_idx}...")
     logger.info(f"{'='*80}")
     
     # Initialize or continue with existing results
@@ -489,15 +519,12 @@ def run_evaluation(df, connection, all_db_tables, args, use_rag=False, start_idx
     start_time = time.time()
     
     # Process queries with progress bar
-    for index, row in tqdm(df.iloc[start_idx:].iterrows(), total=len(df)-start_idx, desc=f"Evaluating with {rag_status}"):
+    for index, row in tqdm(df.iloc[start_idx:].iterrows(), total=len(df)-start_idx, desc=f"Evaluating {rag_status} {auto_correction_status}"):
         try:
             # Save checkpoint periodically if specified
             if args.checkpoint and index % 10 == 0 and index > start_idx:
                 save_point = results.copy()
-                if use_rag:
-                    save_checkpoint(args.checkpoint, index, None, save_point, args)
-                else:
-                    save_checkpoint(args.checkpoint, index, save_point, None, args)
+                save_checkpoint(args.checkpoint, index, None, save_point, None, args)
             
             # Reconnect periodically
             if index % 10 == 0 and index > start_idx:
@@ -516,22 +543,23 @@ def run_evaluation(df, connection, all_db_tables, args, use_rag=False, start_idx
                 estimated_total_time = ((len(df) - start_idx) / queries_per_second) if queries_per_second > 0 else 0
                 estimated_remaining = estimated_total_time - elapsed_time if estimated_total_time > 0 else 0
                 
-                logger.info(f"\n[{index}/{len(df)}] {rag_status} Progress update:")
+                logger.info(f"\n[{index}/{len(df)}] {rag_status} {auto_correction_status} Progress update:")
                 logger.info(f"  - Completed: {index-start_idx}/{len(df)-start_idx} queries ({(index-start_idx)/(len(df)-start_idx)*100:.1f}%)")
                 logger.info(f"  - Elapsed time: {elapsed_time:.1f} seconds")
                 logger.info(f"  - Estimated remaining: {estimated_remaining:.1f} seconds")
                 logger.info(f"  - Queries per second: {queries_per_second:.2f}")
             
-            logger.info(f"\n[{index+1}/{len(df)}] {rag_status} - Evaluating query: '{row['Natural Language Query'][:50]}...'")
+            logger.info(f"\n[{index+1}/{len(df)}] {rag_status} {auto_correction_status} - Evaluating query: '{row['Natural Language Query'][:50]}...'")
             
             # Evaluate the query
             result = evaluate_query(
-                row, connection, all_db_tables, args.api_url, args.timeout, args.verbose, use_rag,
+                row, connection, all_db_tables, args.api_url, args.timeout, args.verbose, use_rag, use_auto_correction,
                 max_retries=args.max_retries, retry_delay=args.retry_delay
             )
             
-            # Add RAG status and index to result
+            # Add RAG and auto-correction status and index to result
             result['use_rag'] = use_rag
+            result['use_auto_correction'] = use_auto_correction
             result['query_index'] = index
             results.append(result)
             
@@ -539,16 +567,16 @@ def run_evaluation(df, connection, all_db_tables, args, use_rag=False, start_idx
             if result['api_success']:
                 if result['syntactically_correct']:
                     if result['logically_correct']:
-                        logger.info(f"  ✓ {rag_status}: API Success, Syntax Correct, Logic Correct")
+                        logger.info(f"  ✓ {rag_status} {auto_correction_status}: API Success, Syntax Correct, Logic Correct")
                     else:
-                        logger.info(f"  ⚠ {rag_status}: API Success, Syntax Correct, Logic INCORRECT")
+                        logger.info(f"  ⚠ {rag_status} {auto_correction_status}: API Success, Syntax Correct, Logic INCORRECT")
                 else:
-                    logger.info(f"  ⚠ {rag_status}: API Success, Syntax INCORRECT: {result.get('error_message', '')[:50]}")
+                    logger.info(f"  ⚠ {rag_status} {auto_correction_status}: API Success, Syntax INCORRECT: {result.get('error_message', '')[:50]}")
             else:
-                logger.info(f"  ✗ {rag_status}: API Failed: {result.get('api_error', '')[:50]}")
+                logger.info(f"  ✗ {rag_status} {auto_correction_status}: API Failed: {result.get('api_error', '')[:50]}")
             
             # Brief pause to avoid overwhelming the API
-            time.sleep(0.5)
+            time.sleep(10)
             
         except KeyboardInterrupt:
             logger.warning(f"\n\nEvaluation interrupted at index {index}. Saving results up to this point.")
@@ -574,6 +602,7 @@ def main():
     # Determine evaluation modes
     run_no_rag = not args.only_rag
     run_rag = args.compare_rag or args.only_rag
+    run_auto_correction = args.compare_auto_correction and run_rag
     
     # Check for checkpoint file
     checkpoint_data = None
@@ -629,8 +658,12 @@ def main():
             logger.info(f"  - Checkpoint file: {args.checkpoint}")
         if run_rag and run_no_rag:
             logger.info(f"  - Mode: Comparing RAG vs non-RAG")
+            if run_auto_correction:
+                logger.info(f"  - Auto-correction: Will compare with RAG")
         elif run_rag:
             logger.info(f"  - Mode: RAG only")
+            if run_auto_correction:
+                logger.info(f"  - Auto-correction: Will evaluate")
         else:
             logger.info(f"  - Mode: Non-RAG only")
         logger.info("=" * 80)
@@ -643,6 +676,7 @@ def main():
     # Results containers
     results_no_rag = checkpoint_data['results_no_rag'] if checkpoint_data and 'results_no_rag' in checkpoint_data else []
     results_rag = checkpoint_data['results_rag'] if checkpoint_data and 'results_rag' in checkpoint_data else []
+    results_rag_auto = []
     
     try:
         # Run non-RAG evaluation if needed
@@ -650,6 +684,7 @@ def main():
             results_no_rag = run_evaluation(
                 df, connection, all_db_tables, args, 
                 use_rag=False, 
+                use_auto_correction=False,
                 start_idx=args.start_idx,
                 existing_results=results_no_rag
             )
@@ -668,12 +703,33 @@ def main():
             # If we already did non-RAG, we can start RAG from index 0
             rag_start_idx = 0 if run_no_rag else args.start_idx
             
+            # Run RAG without auto-correction
             results_rag = run_evaluation(
                 df, connection, all_db_tables, args, 
                 use_rag=True, 
+                use_auto_correction=False,
                 start_idx=rag_start_idx,
                 existing_results=results_rag
             )
+            
+            # Run RAG with auto-correction if requested
+            if run_auto_correction:
+                # Reconnect for auto-correction evaluation
+                if connection and connection.is_connected():
+                    connection.close()
+                connection = connect_to_mysql(args.host, args.user, args.password, args.database)
+                if not connection:
+                    logger.error("Failed to connect to MySQL for auto-correction evaluation. Exiting.")
+                    return
+                all_db_tables = get_all_tables(connection)
+                
+                results_rag_auto = run_evaluation(
+                    df, connection, all_db_tables, args,
+                    use_rag=True,
+                    use_auto_correction=True,
+                    start_idx=0,  # Start from beginning for auto-correction
+                    existing_results=[]
+                )
         
     except KeyboardInterrupt:
         logger.warning("\nEvaluation interrupted by user. Processing results obtained so far...")
@@ -686,6 +742,7 @@ def main():
         # Calculate metrics
         metrics_no_rag = calculate_metrics(results_no_rag) if results_no_rag else None
         metrics_rag = calculate_metrics(results_rag) if results_rag else None
+        metrics_rag_auto = calculate_metrics(results_rag_auto) if results_rag_auto else None
         
         # Print metrics tables
         logger.info("\nEvaluation Results:\n")
@@ -704,10 +761,17 @@ def main():
                 logger.info("\nTop RAG Syntax Errors:\n")
                 logger.info(format_error_table(metrics_rag['syntax_errors']))
         
-        # If both RAG and non-RAG were run, print comparison
-        if metrics_no_rag and metrics_rag:
-            logger.info("\nRAG vs NON-RAG COMPARISON:\n")
-            logger.info(format_comparison_table(metrics_no_rag, metrics_rag))
+        if metrics_rag_auto:
+            logger.info("\n" + format_metrics_table(metrics_rag_auto, "RAG WITH AUTO-CORRECTION METRICS"))
+            
+            if metrics_rag_auto['syntax_errors']:
+                logger.info("\nTop RAG+Auto-correction Syntax Errors:\n")
+                logger.info(format_error_table(metrics_rag_auto['syntax_errors']))
+        
+        # Print comparison tables
+        if metrics_no_rag or metrics_rag or metrics_rag_auto:
+            logger.info("\nPERFORMANCE COMPARISON:\n")
+            logger.info(format_comparison_table(metrics_no_rag, metrics_rag, metrics_rag_auto))
         
         # Save results if output file specified
         if args.output:
@@ -717,6 +781,7 @@ def main():
                     'timeout': args.timeout,
                     'ran_no_rag': run_no_rag,
                     'ran_rag': run_rag,
+                    'ran_auto_correction': run_auto_correction,
                     'max_retries': args.max_retries,
                     'start_idx': args.start_idx
                 }
@@ -729,6 +794,10 @@ def main():
             if metrics_rag:
                 output_data['metrics_rag'] = metrics_rag
                 output_data['details_rag'] = results_rag
+            
+            if metrics_rag_auto:
+                output_data['metrics_rag_auto'] = metrics_rag_auto
+                output_data['details_rag_auto'] = results_rag_auto
             
             with open(args.output, 'w') as f:
                 json.dump(output_data, f, indent=2)

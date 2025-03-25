@@ -64,3 +64,69 @@ CONTINUATION_PROMPT = ChatPromptTemplate.from_messages([
     MessagesPlaceholder(variable_name="history"),
     ("human", "{question}")
 ])
+
+## Auto-correction prompts
+# Prompt for correcting SQL queries with errors
+SQL_CORRECTION_PROMPT = """You are a SQL expert tasked with correcting and improving SQL queries.
+Given the following:
+1. Original query: {original_query}
+2. Error message: {error_message}
+3. Original user request: {user_request}
+4. Table Info Schema (ONLY use columns/tables that exist in the provided Table Info Schema): {table_info}
+
+YOU CANNOT USE ANY COLUMN/TABLE THAT IS NOT PRESENT IN THE PROVIDED TABLE INFO SCHEMA FOLLNG THE KEWORD Columns:
+
+
+Please provide:
+1. A corrected SQL query that fixes the error
+2. A brief explanation of what was wrong and how you fixed it
+
+Remember to:
+- NOT hallucinate column names, ONLY use columns that exist in the provided Table Info Schema after Columns: 
+- Maintain the original intent of the query
+- Sometimes the queries are complex, and might need using multiple columns and tables together.
+- Fix any syntax or semantic errors
+- Ensure proper table/column references
+- Keep the query structure as simple as possible while achieving the goal
+- Follow MySQL syntax and conventions
+- Ensure GROUP BY clauses include all non-aggregated columns
+- Use proper JOIN syntax and table aliases when needed
+- Only use tables and columns that exist in the provided schema
+
+IMPORTANT: Respond with a JSON object in the following format:
+{{
+    "corrected_query": "your corrected SQL query",
+    "explanation": "your explanation of what was wrong and how you fixed it"
+}}
+
+Make sure the JSON is properly formatted and the SQL query is a single line (use spaces for formatting)."""
+
+# Prompt for self-checking SQL queries
+SQL_SELF_CHECK_PROMPT = """You are a SQL expert tasked with explaining and verifying a SQL query.
+Given the following:
+1. SQL Query: {sql_query}
+2. Original user request: {user_request}{table_info}
+
+Please:
+1. Explain what this query does in natural language
+2. Verify if it matches the user's intent
+3. Identify any potential issues or improvements, particularly:
+   - Check if GROUP BY includes all non-aggregated columns
+   - Verify proper JOIN conditions
+   - Check for proper table/column references against the provided schema
+   - Ensure MySQL-specific syntax is used correctly
+   - Verify that all tables and columns exist in the schema
+   - Check if the query might return unexpected results
+
+IMPORTANT: Respond with a JSON object in the following format:
+{{
+    "explanation": "natural language explanation of what the query does",
+    "matches_intent": true/false,
+    "potential_issues": ["issue 1", "issue 2"] or [] if no issues found
+}}
+
+Make sure the JSON is properly formatted and all fields are present."""
+
+# Create ChatPromptTemplates for auto-correction
+SQL_CORRECTION_TEMPLATE = ChatPromptTemplate.from_template(SQL_CORRECTION_PROMPT)
+SQL_SELF_CHECK_TEMPLATE = ChatPromptTemplate.from_template(SQL_SELF_CHECK_PROMPT)
