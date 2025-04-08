@@ -203,7 +203,7 @@ class ChatRequest(BaseModel):
     message: str
     message_type: str
     use_rag: bool = False  # Optional flag to enable RAG
-    use_auto_correction: bool = True  # Optional flag to enable auto-correction, defaults to True
+    use_auto_correction: bool = False  # Optional flag to enable auto-correction, defaults to True
 
 class ChatResponse(BaseModel):
     session_id: str
@@ -315,13 +315,14 @@ async def handle_query(request: Request):
     sql_query = None
     query_results = None 
     memory = get_message_history(chat_request.session_id)
+    natural_language_summary = "Could not generate summary." # Default value
     
     # Initialize auto-correction if enabled
     auto_correction = AutoCorrection(llm, execute_sql_query) if chat_request.use_auto_correction else None
     
     # Invoke the chain with the question
     try:
-        sql_query, memory = run_sql_chain(
+        sql_query_response, memory = run_sql_chain(
             chat_request.message,
             memory.load_memory_variables({})["history"],
             chat_request.session_id,
@@ -332,44 +333,80 @@ async def handle_query(request: Request):
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
     
-    content = sql_query.content
+    # Extract the raw SQL query string
+    content = sql_query_response.content
     if content.startswith('```sql') and content.endswith('```'):
-        sql_query = content[6:-3].strip()
+        initial_sql_query = content[6:-3].strip()
     else:
-        sql_query = content.strip()
+        initial_sql_query = content.strip()
+
+    final_sql_query = initial_sql_query # Default to initial query
     
     try:
-        if chat_request.use_auto_correction:
+        if chat_request.use_auto_correction and auto_correction:
             # Try to execute the query with auto-correction
             corrected_query, correction_explanation, correction_metadata = await auto_correction.correct_query(
-                sql_query,
+                initial_sql_query,
                 "",  # No initial error message
                 chat_request.message
             )
+            final_sql_query = corrected_query # Update final query if corrected
             
             # Execute the final query
-            query_results = execute_sql_query(corrected_query)
+            query_results = execute_sql_query(final_sql_query)
             
-            # Update the response with correction information
+            # Generate summary for the corrected query
+            try:
+                summary_messages = SQL_SUMMARY_TEMPLATE.format_messages(
+                    user_question=chat_request.message,
+                    sql_query=final_sql_query
+                )
+                summary_response = await llm.ainvoke(summary_messages)
+                natural_language_summary = summary_response.content
+            except Exception as summary_error:
+                print(f"Error generating summary: {summary_error}")
+
+            # Update the response with correction information and summary
             return {
-                "sql_query": corrected_query,
+                "sql_query": final_sql_query,
                 "query_results": query_results,
+                "natural_language_summary": natural_language_summary, # Add summary
                 "correction_explanation": correction_explanation,
                 "correction_metadata": correction_metadata,
                 "auto_correction_used": True
             }
         else:
             # Execute query without auto-correction
-            query_results = execute_sql_query(sql_query)
+            final_sql_query = initial_sql_query # Final query is the initial one
+            query_results = execute_sql_query(final_sql_query)
+
+            # Generate summary for the initial query
+            try:
+                summary_messages = SQL_SUMMARY_TEMPLATE.format_messages(
+                    user_question=chat_request.message,
+                    sql_query=final_sql_query
+                )
+                summary_response = await llm.ainvoke(summary_messages)
+                natural_language_summary = summary_response.content
+            except Exception as summary_error:
+                print(f"Error generating summary: {summary_error}")
+                
             return {
-                "sql_query": sql_query,
+                "sql_query": final_sql_query,
                 "query_results": query_results,
+                "natural_language_summary": natural_language_summary, # Add summary
                 "auto_correction_used": False
             }
             
     except Exception as e:
-        print(f"Error executing query: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error executing query or generating summary: {e}")
+        # Attempt to return basic info even if execution/summary fails
+        return {
+             "sql_query": final_sql_query,
+             "query_results": f"Error during execution or summary generation: {str(e)}",
+             "natural_language_summary": "Could not generate summary due to error.",
+             "auto_correction_used": chat_request.use_auto_correction
+        }
 
 if __name__ == "__main__":
     import uvicorn

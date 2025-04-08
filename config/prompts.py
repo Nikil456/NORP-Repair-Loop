@@ -130,3 +130,9 @@ Make sure the JSON is properly formatted and all fields are present."""
 # Create ChatPromptTemplates for auto-correction
 SQL_CORRECTION_TEMPLATE = ChatPromptTemplate.from_template(SQL_CORRECTION_PROMPT)
 SQL_SELF_CHECK_TEMPLATE = ChatPromptTemplate.from_template(SQL_SELF_CHECK_PROMPT)
+
+# New template for SQL Summary
+SQL_SUMMARY_TEMPLATE = ChatPromptTemplate.from_messages([
+    ("system", "You are an expert assistant. Your task is to explain a given SQL query in plain, easy-to-understand English based on the original user question. Provide a concise summary (1-2 sentences) describing what the query does."),
+    ("human", "Original Question: {user_question}\n\nSQL Query:\n```sql\n{sql_query}\n```\n\nPlease provide a plain English summary of what this SQL query is doing."),
+])
