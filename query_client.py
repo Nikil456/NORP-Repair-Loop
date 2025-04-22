@@ -17,7 +17,7 @@ def send_hardcoded_query(url: str = DEFAULT_URL):
         "session_id": "123",
         "question": "For each zipcode, get mean commute time and average housing value.",
         "message_type": "human",  # Assuming message_type is always 'human' for a client query
-        "use_rag": True,
+        "use_rag": False,
         "use_auto_correction": False,
         "generate_summary": False  # Default to True to maintain current behavior
     }

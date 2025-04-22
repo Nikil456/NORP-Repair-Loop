@@ -9,8 +9,8 @@ from utils.util import read_gpg_encrypted_file
 
 # TODO: Make this an env variable
 # Simply add the private key for LLM you are using
+# NVIDIA_API_KEY = "REDACTED"
 NVIDIA_API_KEY = "REDACTED"
-
 class LLMManager():
     """
     Initialize NVIDIA LLM connection with API key.

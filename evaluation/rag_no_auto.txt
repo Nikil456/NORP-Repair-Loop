@@ -1,0 +1,47 @@
+Using default NVIDIA API key
+NVIDIA API key set in environment
+Database connection initialized successfully.
+Output file rag_no_auto.csv found with 47 results. Resuming from input row 48.
+Running evaluation with flags: use_rag=True, use_auto_correction=False, generate_summary=False
+Results will be saved incrementally to: rag_no_auto.csv
+Processing 209 rows from the input file (starting at index 47).
+--- Processing Original Row 47 ---
+Executing ground truth query locally: SELECT
+  `source`.`zipcode` AS `zipcode`,
+  `source`.`house_value_weighted_average` AS `house_value_weighted_average`,
+  `Economic Income And Benefits`.`median_household_income` AS `Economic Income And Benefits__median_household_income`
+FROM
+  (
+    select
+      zipcode,
+      cast(
+        (
+          sum(
+            number_of_units * ((house_value_min + house_value_max) / 2)
+          ) / sum(number_of_units)
+        ) as decimal(8, 2)
+      ) as house_value_weighted_average
+    from
+      housing_value
+    where
+      year = 2022
+    group by
+      zipcode
+  ) AS `source`
+ 
+LEFT JOIN `economic_income_and_benefits` AS `Economic Income And Benefits` ON `source`.`zipcode` = `Economic Income And Benefits`.`zipcode`
+WHERE
+  `Economic Income And Benefits`.`year` = 2022
+LIMIT
+  1048575
+Ground truth execution result (first 500 chars): [('ZCTA5 30004', Decimal('628939.90'), 136124.0), ('ZCTA5 30005', Decimal('623140.44'), 162808.0), ('ZCTA5 30008', Decimal('258858.05'), 68218.0), ('ZCTA5 30009', Decimal('663184.65'), 135081.0), ('ZCTA5 30011', Decimal('311540.86'), 85274.0), ('ZCTA5 30012', Decimal('225842.98'), 56825.0), ('ZCTA5 30013', Decimal('267712.85'), 70987.0), ('ZCTA5 30014', Decimal('263126.04'), 68163.0), ('ZCTA5 30016', Decimal('223902.65'), 70933.0), ('ZCTA5 30017', Decimal('402586.27'), 109890.0), ('ZCTA5 30018',
+Sending question to API: For each zipcode in the year 2022, get average housing value and median household income.
+Payload:
+{
+  "session_id": 681243,
+  "question": "For each zipcode in the year 2022, get average housing value and median household income.",
+  "message_type": "human",
+  "use_rag": true,
+  "use_auto_correction": false,
+  "generate_summary": false
+}

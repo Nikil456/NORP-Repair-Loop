@@ -6,6 +6,7 @@ from config.prompts import SQL_CORRECTION_TEMPLATE, SQL_SELF_CHECK_TEMPLATE
 from rag.rag import SchemaRAG
 import json
 import re
+import asyncio
 
 # Constants for auto-correction
 MAX_CORRECTION_ATTEMPTS = 5
@@ -123,6 +124,7 @@ class AutoCorrection:
         
         while attempts < MAX_CORRECTION_ATTEMPTS:
             try:
+                print("Executing query...")
                 # Try to execute the current query
                 result = self.execute_query_func(current_query)
                 
@@ -193,8 +195,36 @@ class AutoCorrection:
                     table_info=f"\nAvailable table schema:\n{table_info}" if table_info else ""
                 )
                 print("correction_messages", correction_messages)
-                # Get correction from LLM
-                correction_response = await self.llm.ainvoke(correction_messages)
+                
+                # Retry logic for correction LLM call
+                max_retries = 5
+                timeout_seconds = 25
+                correction_response = None
+                last_correction_exception = None
+
+                for attempt in range(max_retries):
+                    try:
+                        print(f"Attempting correction LLM call (Attempt {attempt + 1}/{max_retries})...")
+                        correction_response = await asyncio.wait_for(
+                            self.llm.ainvoke(correction_messages),
+                            timeout=timeout_seconds
+                        )
+                        print(f"Correction LLM call successful (Attempt {attempt + 1}).")
+                        break # Exit retry loop on success
+                    except asyncio.TimeoutError:
+                        print(f"Correction LLM call timed out after {timeout_seconds}s (Attempt {attempt + 1}). Retrying...")
+                        last_correction_exception = asyncio.TimeoutError(f"Correction LLM call failed after {max_retries} attempts due to timeout.")
+                    except Exception as e:
+                        print(f"Correction LLM call failed with non-timeout error on attempt {attempt + 1}: {e}")
+                        last_correction_exception = e
+                        break # Break on non-timeout errors
+
+                if correction_response is None:
+                    if last_correction_exception:
+                        raise last_correction_exception # Raise the error if all retries failed
+                    else:
+                        raise Exception("Correction LLM call failed after retries for unknown reason.")
+
                 corrected_query, explanation = self._parse_correction_response(correction_response.content)
                 
                 # Validate the corrected query 
@@ -258,5 +288,33 @@ class AutoCorrection:
             table_info=f"\nAvailable table schema:\n{table_info}" if table_info else ""
         )
         
-        check_response = await self.llm.ainvoke(check_messages)
+        max_retries = 5
+        timeout_seconds = 25
+        check_response = None
+        last_check_exception = None
+
+        # Retry logic for self-check LLM call
+        for attempt in range(max_retries):
+            try:
+                print(f"Attempting self-check LLM call (Attempt {attempt + 1}/{max_retries})...")
+                check_response = await asyncio.wait_for(
+                    self.llm.ainvoke(check_messages),
+                    timeout=timeout_seconds
+                )
+                print(f"Self-check LLM call successful (Attempt {attempt + 1}).")
+                break # Exit retry loop on success
+            except asyncio.TimeoutError:
+                print(f"Self-check LLM call timed out after {timeout_seconds}s (Attempt {attempt + 1}). Retrying...")
+                last_check_exception = asyncio.TimeoutError(f"Self-check LLM call failed after {max_retries} attempts due to timeout.")
+            except Exception as e:
+                print(f"Self-check LLM call failed with non-timeout error on attempt {attempt + 1}: {e}")
+                last_check_exception = e
+                break # Break on non-timeout errors
+
+        if check_response is None:
+            if last_check_exception:
+                raise last_check_exception # Raise the error if all retries failed
+            else:
+                raise Exception("Self-check LLM call failed after retries for unknown reason.")
+
         return self._parse_self_check_response(check_response.content) 

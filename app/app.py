@@ -1,5 +1,6 @@
 import os
 import sys
+import asyncio
 
 # Add the parent directory to the path to find modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -24,6 +25,7 @@ from langchain_core.runnables.base import RunnableLambda
 from utils.constants import *
 from config.prompts import *
 from auto_correction.auto_correction import AutoCorrection
+from fastapi.concurrency import run_in_threadpool
 
 # Import RAG if available
 try:
@@ -100,7 +102,7 @@ class ChatResponse(BaseModel):
     query_result: Optional[str]
     history: List[dict]
 
-def run_sql_chain(question: str, history: List[dict], session_id: str, memory: ConversationBufferMemory, use_rag: bool = False):
+async def run_sql_chain(question: str, history: List[dict], session_id: str, memory: ConversationBufferMemory, use_rag: bool = False):
     """Run the SQL generation chain with conversation history"""
     
     # Get table information - use RAG if enabled and available
@@ -112,14 +114,36 @@ def run_sql_chain(question: str, history: List[dict], session_id: str, memory: C
         if schema_rag.is_initialized():
             table_info = schema_rag.get_table_info_for_rag(question)
             print(f"RAG table_info: {table_info}")
+            assert table_info is not None, "RAG table_info is None"
             if not table_info:  # Fallback to complete table info if RAG returns nothing
                 table_info = db.get_table_info()
+            # Log RAG table info
+            try:
+                with open("rag_table_info.txt", "a") as f:
+                    f.write(f"{table_info}\n{'-'*80}\n")
+            except FileNotFoundError:
+                with open("rag_table_info.txt", "w") as f:
+                    f.write(f"{table_info}\n{'-'*80}\n")
         else:
             # Fallback to regular table_info if RAG not initialized
             table_info = db.get_table_info()
+            # Log non-RAG table info when RAG fails
+            try:
+                with open("non_rag_table_info.txt", "a") as f:
+                    f.write(f"{table_info}\n{'-'*80}\n")
+            except FileNotFoundError:
+                with open("non_rag_table_info.txt", "w") as f:
+                    f.write(f"{table_info}\n{'-'*80}\n")
     else:
         # Use regular table info
         table_info = db.get_table_info()
+        # Log non-RAG table info
+        try:
+            with open("non_rag_table_info.txt", "a") as f:
+                f.write(f"{table_info}\n{'-'*80}\n")
+        except FileNotFoundError:
+            with open("non_rag_table_info.txt", "w") as f:
+                f.write(f"{table_info}\n{'-'*80}\n")
  
     # Prepare messages for the prompt
     messages = []
@@ -164,13 +188,49 @@ def run_sql_chain(question: str, history: List[dict], session_id: str, memory: C
             raise ValueError(f"Unexpected message format: {msg}")
 
     # Create the SQL generation chain
+    print(f"Creating chain")
     sql_generation_chain = (
         RunnableLambda(lambda x: x)  # Pass messages directly
         | llm
     )
-    
-    # Invoke the chain
-    result = sql_generation_chain.invoke(formatted_messages)
+    print(f"Invoking chain")
+
+    max_retries = 5
+    timeout_seconds = 25
+    result = None
+    last_exception = None
+
+    for attempt in range(max_retries):
+        try:
+            print(f"Attempting chain invocation (Attempt {attempt + 1}/{max_retries})...")
+            # Invoke the chain with timeout
+            result = await asyncio.wait_for(
+                sql_generation_chain.ainvoke(formatted_messages),
+                timeout=timeout_seconds
+            )
+            print(f"Chain invocation successful (Attempt {attempt + 1}).")
+            print(f"SQL Generation LLM call completed. Result content: {result.content[:100]}...") # Log completion
+            break  # Exit loop if successful
+        except asyncio.TimeoutError:
+            print(f"Chain invocation timed out after {timeout_seconds} seconds (Attempt {attempt + 1}/{max_retries}). Retrying...")
+            last_exception = asyncio.TimeoutError(f"Chain invocation failed after {max_retries} attempts due to timeout.")
+            # Optional: await asyncio.sleep(1) # Add a small delay before retrying if desired
+        except Exception as e:
+            print(f"Chain invocation failed with non-timeout error on attempt {attempt + 1}: {e}")
+            last_exception = e
+            break # Break on non-timeout errors
+
+    if result is None:
+        # If all retries failed, raise the last known exception
+        if last_exception:
+            # Ensure the exception is raiseable, wrap if necessary
+            if isinstance(last_exception, BaseException):
+                 raise last_exception
+            else:
+                 raise Exception(f"Chain invocation failed after retries: {last_exception}")
+        else:
+            # Fallback if loop didn't even run once or break correctly
+            raise Exception("Chain invocation failed after multiple retries for an unknown reason.")
 
     # update redis and history
     for msg in messages:
@@ -178,13 +238,13 @@ def run_sql_chain(question: str, history: List[dict], session_id: str, memory: C
         message_type = ""
         message = ""
         if isinstance(msg, SystemMessage):
-            message_type="system",
+            message_type="system"
             message = msg.content
         elif isinstance(msg, HumanMessage):
-            message_type="human",
+            message_type="human"
             message = msg.content
         elif isinstance(msg, AIMessage):
-            message_type="ai",
+            message_type="ai"
             message = msg.content
         elif isinstance(msg, MessagesPlaceholder):
             continue
@@ -194,6 +254,7 @@ def run_sql_chain(question: str, history: List[dict], session_id: str, memory: C
 
     memory = update_chat_memory_and_redis_history(session_id, result.content, 
                                                   "ai", memory)
+    print(f"Returning result and memory")
     return (result, memory)
     
 
@@ -285,11 +346,12 @@ def update_chat_memory_and_redis_history(session_id: Union[int, str], message_co
         print(f"Error updating chat memory: {e}")
         return memory
 
-def execute_sql_query(sql_query:str):
+async def execute_sql_query(sql_query:str):
     execute_query = QuerySQLDataBaseTool(db=db)
     query_results=None
     try:
-        query_results = execute_query.invoke({"query": sql_query})
+        # Run the synchronous database tool in a thread pool
+        query_results = await run_in_threadpool(execute_query.invoke, {"query": sql_query})
     except Exception as e:
         # TODO: Add feedback loop here when memory issue is sorted
         error_message = str(e)
@@ -323,8 +385,9 @@ async def handle_query(request: Request):
     auto_correction = AutoCorrection(llm, execute_sql_query) if chat_request.use_auto_correction else None
     
     # Invoke the chain with the question
+    print("Attempting to generate initial SQL...")
     try:
-        sql_query_response, memory = run_sql_chain(
+        sql_query_response, memory = await run_sql_chain(
             chat_request.message,
             memory.load_memory_variables({})["history"],
             chat_request.session_id,
@@ -332,9 +395,11 @@ async def handle_query(request: Request):
             chat_request.use_rag
         )
     except Exception as e:
+        print(f"Error during initial SQL generation: {e}")
         print(e)
         raise HTTPException(status_code=500, detail=str(e))
     
+    print("Initial SQL generated successfully.")
     # Extract the raw SQL query string
     content = sql_query_response.content
     if content.startswith('```sql') and content.endswith('```'):
@@ -346,6 +411,7 @@ async def handle_query(request: Request):
     
     try:
         if chat_request.use_auto_correction and auto_correction:
+            print("Attempting auto-correction...")
             # Try to execute the query with auto-correction
             corrected_query, correction_explanation, correction_metadata = await auto_correction.correct_query(
                 initial_sql_query,
@@ -353,9 +419,12 @@ async def handle_query(request: Request):
                 chat_request.message
             )
             final_sql_query = corrected_query # Update final query if corrected
+            print(f"Auto-correction completed. Corrected query: {final_sql_query}")
             
             # Execute the final query
-            query_results = execute_sql_query(final_sql_query)
+            print("Executing final (corrected) SQL query...")
+            query_results = await execute_sql_query(final_sql_query)
+            print("Final (corrected) SQL query executed.")
             
             # Generate summary for the corrected query if enabled
             if chat_request.generate_summary:
@@ -366,6 +435,7 @@ async def handle_query(request: Request):
                     )
                     summary_response = await llm.ainvoke(summary_messages)
                     natural_language_summary = summary_response.content
+                    print("Generated summary for corrected query.")
                 except Exception as summary_error:
                     print(f"Error generating summary: {summary_error}")
 
@@ -381,7 +451,9 @@ async def handle_query(request: Request):
         else:
             # Execute query without auto-correction
             final_sql_query = initial_sql_query # Final query is the initial one
-            query_results = execute_sql_query(final_sql_query)
+            print("Executing initial SQL query (no auto-correction)...")
+            query_results = await execute_sql_query(final_sql_query)
+            print("Initial SQL query executed (no auto-correction).")
 
             # Generate summary for the initial query if enabled
             if chat_request.generate_summary:
@@ -392,6 +464,7 @@ async def handle_query(request: Request):
                     )
                     summary_response = await llm.ainvoke(summary_messages)
                     natural_language_summary = summary_response.content
+                    print("Generated summary for initial query.")
                 except Exception as summary_error:
                     print(f"Error generating summary: {summary_error}")
                 
@@ -405,6 +478,7 @@ async def handle_query(request: Request):
     except Exception as e:
         print(f"Error executing query or generating summary: {e}")
         # Attempt to return basic info even if execution/summary fails
+        print(f"Returning response")
         return {
              "sql_query": final_sql_query,
              "query_results": f"Error during execution or summary generation: {str(e)}",
