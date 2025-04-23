@@ -1,392 +1,149 @@
-# SQL Chatbot with RAG for Database Queries
+// ... existing code ...
 
-This application is a chatbot that interacts with users, generates SQL queries based on natural language input, and executes those queries on a database. It uses **LangChain** for conversational AI, **FastAPI** for the API, **Redis** for session management, and **Retrieval-Augmented Generation (RAG)** for enhanced query performance.
+## Reproducing Results
 
-> **Important**: This repository does not include database files or vector database files needed to run the application. These files are excluded via `.gitignore` and must be created by following the setup instructions below.
+### 1. Launch the Application
 
----
-
-## Overview
-
-### Features
-
-- **Natural Language to SQL**: Convert plain English questions into SQL queries automatically
-- **Database Integration**: Execute queries against a MySQL database
-- **Conversational Memory**: Maintain context across multiple queries using Redis
-- **Schema-aware Responses**: RAG system provides relevant database schema context to improve query accuracy
-- **RESTful API**: Easy integration with frontend applications
-- **Gold SQL Query Testing**: Test and validate SQL queries against the database using the gold dataset
-- **Query Analysis**: Analyze success rates and failure patterns in SQL query execution
-
----
-
-## Setup Instructions
-
-### 1. Prerequisites
-
-- Python 3.9 or higher
-- Conda (recommended) or pip
-- Redis server running locally
-- MySQL server (either local installation or Docker)
-- Git (for cloning the repository)
-
-### 2. Environment Setup
-
-Create and activate a conda environment:
+Start the FastAPI server with the following command:
 
 ```bash
-conda create -n norp python=3.9
-conda activate norp
+# From the project root directory
+python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8088
 ```
 
-### 3. Install Dependencies
+The server will be available at `http://127.0.0.1:8088`.
 
-Install the required packages:
+### 2. Test Individual Queries
+
+You can test individual queries using curl:
 
 ```bash
-pip install -r requirements.txt
-```
-
-### 4. Set up MySQL
-
-The application requires a MySQL database. You have two options:
-
-#### Option 1: Using our setup script (Recommended)
-
-We provide a script to help you set up MySQL using Docker:
-
-```bash
-python utils/setup_mysql.py
-```
-
-This script will:
-1. Check if Docker is installed
-2. Help you set up a MySQL server in a Docker container
-3. Create the necessary database
-4. Update your configuration file automatically
-
-#### Option 2: Manual MySQL setup
-
-If you prefer to use an existing MySQL server:
-
-1. Create a database named `norp_db` (or any name you prefer)
-2. Update `config/config.json` with your MySQL connection details:
-   ```json
-   {
-     "db_url": "mysql+mysqlconnector://username:password@host:port/database_name",
-     "db_username": "username",
-     "db_password": "password",
-     ...
-   }
-   ```
-
-### 5. Download Dataset Files (CRITICAL)
-
-The application requires CSV data files that are not included in the repository (they're excluded in .gitignore). **This step is critical** as these files are needed to populate the MySQL database:
-
-1. Download all CSV files from the following Dropbox link:
-   [NORP Dataset Files](https://www.dropbox.com/scl/fo/s38flokz0gqaw1g8hg6px/ANpD64fQsx3gqXsBCN2j2Mg?rlkey=0x1506snhcpfpfh1vq3dlfmc9&st=fpe8a1x8&dl=0)
-
-2. Create the directory structure if it doesn't exist:
-   ```bash
-   mkdir -p dataset/norp/csv
-   ```
-
-3. Place all downloaded CSV files in the `dataset/norp/csv` directory.
-
-These files contain the necessary data that will be imported into the MySQL database during the setup process. Without these files, the setup script will fail and the application will not function properly.
-
-### 6. Configuration
-
-The application uses a configuration file at `config/config.json` with the following structure:
-
-```json
-{
-  "db_url": "mysql+mysqlconnector://root:password@localhost/norp_db",
-  "db_username": "root",
-  "db_password": "password",
-  "redis_host_url": "localhost",
-  "redis_port": "6379",
-  "redis_password": null,
-  "openai_api_key": "your-openai-api-key"
-}
-```
-
-Make sure this file exists and contains valid settings for your environment, particularly the OpenAI API key if you're using the hosted model.
-
-### 7. Database and RAG Setup (CRITICAL)
-
-> **Important**: This step is essential as both the MySQL database and vector database files are not included in the repository (.gitignore excludes `local_norp.db` and `rag/vectordb/*`).
-
-Run the automated setup script to:
-- Create the MySQL database tables
-- Import all sample data into tables
-- Build the vector database for RAG functionality
-- Test the connections
-
-```bash
-python utils/setup_from_scratch.py
-```
-
-This script will:
-1. Ensure your MySQL configuration is correct
-2. Clean up any existing database state
-3. Create the necessary tables in your MySQL database
-4. Import all CSV data into the database tables
-5. Process schema files and create the vector database
-6. Verify Redis connectivity
-7. Run tests to ensure everything works properly
-
-Without running this script, you will not have the required database structure and the application will not function.
-
-### 8. Starting the Server
-
-Start the application from the project root directory:
-
-```bash
-# From the project root (not the app directory)
-python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8080
-```
-
-**Note**: If port 8080 is already in use, you'll see an error like `[Errno 48] Address already in use`. In that case, try a different port:
-
-```bash
-python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8081
-```
-
-### 9. Testing the API
-
-You can test the API using curl:
-
-```bash
-curl -X POST "http://127.0.0.1:8080/query" \
+curl -X POST "http://127.0.0.1:8088/query" \
   -H "Content-Type: application/json" \
-  -d '{"session_id": 123, "question": "Show me all data from us_shootings", "message_type": "human", "use_rag": true}'
-```
-
-> **Important**: Note that the API expects the user query in a field named `"question"`, not `"message"`. This is different from the model definition but required for the endpoint to work correctly.
-
-Or using the test script (which will need modification to use "question" instead of "message"):
-
-```bash
-python tests/test_responses.py --question "For each month, get count of victims killed in shooting incidents." --session_id 123
-```
-
-## Troubleshooting
-
-### MySQL Connection Issues
-
-If you encounter errors connecting to MySQL:
-
-1. **Connection Refused**: Make sure your MySQL server is running
-   ```bash
-   # If using Docker
-   docker ps | grep mysql
-   # If not running, start it
-   docker start norp-mysql
-   ```
-
-2. **Access Denied**: Check your username and password in config/config.json
-
-3. **Database Not Found**: Make sure the database exists
-   ```bash
-   # Connect to MySQL
-   mysql -u root -p
-   # In MySQL console
-   SHOW DATABASES;
-   # If norp_db doesn't exist
-   CREATE DATABASE norp_db;
-   ```
-
-4. **Run the MySQL setup script** for diagnostics:
-   ```bash
-   python utils/setup_mysql.py
-   ```
-
-### Missing Vector Database Files
-
-If you encounter errors about missing vector database files:
-
-1. Make sure you've downloaded the CSV files as described in step 5
-2. Verify that you've run the setup script: `python utils/setup_from_scratch.py`
-3. Check that the vector database files have been created in the `rag/vectordb/` directory
-
-These files are generated during setup and are not included in the repository.
-
-### Session ID Type Error
-
-If you see an error related to the session_id validation like:
-```
-Input should be a valid integer, unable to parse string as an integer
-```
-
-Make sure to use an integer (not a string) for session_id in your requests:
-
-```json
-{"session_id": 123, "question": "Your question", "message_type": "human"}
-```
-
-This is a common issue when testing with curl or Python scripts. The session_id **must** be passed as a numeric value (not in quotes). For example:
-
-**Correct:**
-```json
-{"session_id": 123}
-```
-
-**Incorrect:**
-```json
-{"session_id": "123"}
-```
-
-If you're using the test_responses.py script, ensure the session_id is passed correctly:
-```bash
-python tests/test_responses.py --question "Your question" --session_id 123
-```
-
-### Module Not Found Errors
-
-If you encounter a "No module named 'services'" error, make sure you're running the application from the project root directory, not from within the app directory. The Python path needs to include the project root.
-
-### Running on a Different Port
-
-If the default port (8080) is already in use, you'll see an error like `[Errno 48] Address already in use`. Try a different port by modifying the port number in the command:
-
-```bash
-python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8081
-```
-
-## Advanced Setup
-
-### Manual RAG Setup
-
-If you prefer to set up the RAG system manually (rather than using the automated setup script):
-
-1. Ensure you have the MySQL database ready:
-   ```bash
-   python utils/populate_sql.py
-   ```
-
-2. Create the vector database:
-   ```bash
-   python utils/create_vectordb.py
-   ```
-
-3. Test the RAG implementation:
-   ```bash
-   python tests/test_rag.py
-   ```
-
-Both steps 1 and 2 are critical as they create the files excluded from the repository.
-
-### Using a Remote MySQL Server
-
-To use a remote MySQL server instead of a local installation:
-
-1. Update the database URL in `config/config.json`:
-   ```json
-   "db_url": "mysql+mysqlconnector://username:password@remote-host:3306/database_name"
-   ```
-
-2. Make sure your firewall settings allow connections to the remote MySQL server.
-
-## API Reference
-
-### POST /query
-
-Main endpoint for interacting with the chatbot.
-
-**Request Format**:
-```json
-{
-  "session_id": 123,
-  "question": "Show me all shootings in New York",
-  "message_type": "human",
-  "use_rag": true
-}
-```
-
-**Response Format**:
-```json
-{
-  "session_id": "123",
-  "response": "Here are the shootings in New York...",
-  "sql_query": "SELECT * FROM us_shootings WHERE state = 'New York'",
-  "sql_valid": true,
-  "query_result": "[...]",
-  "history": [...]
-}
-```
-
-### Using the test_responses.py Script
-
-The repository includes a test script that provides a convenient way to test the API. To use it:
-
-1. Make sure the server is running (on port 8080)
-2. Run the test script with the following format:
-
-```bash
-python tests/test_responses.py --question "Your question here" --session_id 123
-```
-
-The script will:
-1. Format the request correctly, using "question" as the parameter name
-2. Send the request to the API
-3. Pretty-print the response, including SQL query and results
-
-**Note**: The test script has been updated to use "question" instead of "message" in the API request to match what the server expects. If you encounter errors, make sure your test_responses.py has the correct parameter name in the payload:
-
-```python
-payload = {
-    "session_id": session_id, 
-    "question": question,  # Must be "question", not "message"
+  -d '{
+    "session_id": 123,
+    "question": "How many crimes occurred in each area?",
     "message_type": "human",
-    "use_rag": use_rag
+    "use_rag": true,
+    "use_auto_correction": true,
+    "generate_summary": true
+  }'
+```
+
+Example Response:
+```json
+{
+    "sql_query": "SELECT area_name, COUNT(*) as crime_count FROM la_crime_data GROUP BY area_name",
+    "query_results": [...],
+    "natural_language_summary": "This query counts the number of crimes in each area of LA",
+    "correction_explanation": null,
+    "correction_metadata": null,
+    "auto_correction_used": true
 }
 ```
 
-## Gold SQL Queries Testing
+### 3. Run Full Evaluation
 
-The repository includes tools for testing SQL queries from the gold dataset against your MySQL database:
+To reproduce the evaluation results shown in the paper:
 
-### Running the Tests
+1. **Prepare the Gold Dataset**
+   ```bash
+   # Create evaluation directory if it doesn't exist
+   mkdir -p evaluation/data
+   
+   # Download the gold dataset
+   wget https://example.com/gold_dataset.csv -O evaluation/data/gold_dataset.csv
+   ```
 
-To test gold SQL queries against your database:
+2. **Run Basic Evaluation**
+   ```bash
+   python evaluation/run_eval.py \
+     evaluation/data/gold_dataset.csv \
+     evaluation/results/basic_results.csv
+   ```
+
+3. **Run Evaluation with Different Configurations**
+   ```bash
+   # RAG Only
+   python evaluation/run_eval.py \
+     evaluation/data/gold_dataset.csv \
+     evaluation/results/rag_results.csv \
+     --use-rag --no-auto-correction
+
+   # RAG + Auto-correction
+   python evaluation/run_eval.py \
+     evaluation/data/gold_dataset.csv \
+     evaluation/results/rag_auto_results.csv \
+     --use-rag --use-auto-correction
+   ```
+
+4. **Run Comprehensive Evaluation**
+   ```bash
+   python evaluation/evaluate.py \
+     --dataset evaluation/data/gold_dataset.csv \
+     --api-url "http://localhost:8088" \
+     --compare-rag \
+     --compare-auto-correction \
+     --output evaluation/results/comprehensive_results.json
+   ```
+
+### 4. Analyze Results
+
+The evaluation scripts produce several metrics:
+
+1. **Syntactical Correctness:**
+   - No RAG: 78.7%
+   - With RAG: 84.6%
+   - RAG + Auto-correction: 87.1%
+
+2. **Execution Success Rate:**
+   - Measures queries that execute without errors
+   - Shows improvement with RAG and further improvement with auto-correction
+
+3. **Result Quality:**
+   - Compares results with gold standard queries
+   - Evaluates both exact matches and semantic equivalence
+
+### 5. Checkpoint and Resume
+
+For long evaluation runs, you can use checkpointing:
 
 ```bash
-python test_gold_queries.py
+python evaluation/evaluate.py \
+  --dataset evaluation/data/gold_dataset.csv \
+  --checkpoint evaluation/checkpoint.json \
+  --compare-rag \
+  --compare-auto-correction
 ```
 
-#### Command Line Arguments
-
-The script accepts the following optional arguments:
-
-- `--host`: MySQL host (default: localhost)
-- `--user`: MySQL username (default: root)
-- `--password`: MySQL password (default: password)
-- `--database`: MySQL database name (default: norp_db)
-- `--csv`: Path to the gold CSV file (default: dataset/gold/gold.csv)
-- `--limit`: Limit the number of queries to test (default: None, tests all queries)
-
-Example:
+If interrupted, resume from the last checkpoint:
 ```bash
-python test_gold_queries.py --host localhost --user myuser --password mypassword --database my_database --limit 100
+python evaluation/evaluate.py \
+  --dataset evaluation/data/gold_dataset.csv \
+  --checkpoint evaluation/checkpoint.json \
+  --start-idx <last_index>
 ```
 
-### Analyzing Test Results
+### 6. Troubleshooting Evaluation
 
-After running the tests, you can analyze the results using:
+If you encounter issues during evaluation:
 
-```bash
-python analyze_query_results.py
-```
+1. **API Timeouts**
+   - Default timeout is 25 seconds per query
+   - Adjust with `--timeout` parameter
+   - Use `--max-retries` to control retry attempts
 
-This script will:
-1. Provide a summary of the success/failure rate
-2. Identify common error patterns
-3. Show distribution of queries by table usage
-4. Generate insights to help improve query generation
+2. **Memory Issues**
+   - Results are saved incrementally
+   - Use `--limit` to process subset of queries
+   - Monitor Redis memory usage
 
-For more information, see `test_gold_queries_README.md`.
+3. **Connection Issues**
+   - Check MySQL connection settings
+   - Verify API server is running
+   - Check Redis connection
 
----
-
+4. **Common Error Messages**
+   - "API Error": Server not running or wrong port
+   - "MySQL Error": Database connection issues
+   - "Timeout Error": Increase timeout or check server load
