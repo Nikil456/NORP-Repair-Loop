@@ -1,6 +1,10 @@
 import os
 import sys
 import asyncio
+from dotenv import load_dotenv
+
+# Load environment variables from .env before anything else
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # Add the parent directory to the path to find modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -65,15 +69,17 @@ def read_json(file_name):
 config_details = read_json('config.json')
 if config_details is None:
     print("Failed to load configuration. Using default values.")
-    config_details = {
-        "db_url": "sqlite:///local_norp.db",
-        "db_username": "",
-        "db_password": "",
-        "redis_host_url": "localhost",
-        "redis_port": "6379",
-        "redis_password": None,
-        "openai_api_key": "REDACTED"
-    }
+    config_details = {}
+
+# Always override sensitive values from environment variables (env takes priority over config.json)
+config_details['db_url'] = os.environ.get('DB_URL') or config_details.get('db_url') or 'sqlite:///local_norp.db'
+config_details['db_username'] = os.environ.get('DB_USERNAME') or config_details.get('db_username', '')
+config_details['db_password'] = os.environ.get('DB_PASSWORD') or config_details.get('db_password', '')
+config_details['redis_host_url'] = os.environ.get('REDIS_HOST_URL') or config_details.get('redis_host_url', 'localhost')
+config_details['redis_port'] = os.environ.get('REDIS_PORT') or config_details.get('redis_port', '6379')
+config_details['redis_password'] = os.environ.get('REDIS_PASSWORD') or config_details.get('redis_password')
+config_details['openai_api_key'] = os.environ.get('OPENAI_API_KEY') or config_details.get('openai_api_key', '')
+config_details['nvidia_api_key'] = os.environ.get('NVIDIA_API_KEY') or config_details.get('nvidia_api_key', '')
 
 app = FastAPI()
 

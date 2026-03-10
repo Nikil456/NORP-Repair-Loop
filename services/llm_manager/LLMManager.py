@@ -7,10 +7,7 @@ from langchain_nvidia_ai_endpoints import ChatNVIDIA
 from langchain_core.prompts import ChatPromptTemplate
 from utils.util import read_gpg_encrypted_file
 
-# TODO: Make this an env variable
-# Simply add the private key for LLM you are using
-# NVIDIA_API_KEY = "REDACTED"
-NVIDIA_API_KEY = "REDACTED"
+# NVIDIA API key is loaded from the NVIDIA_API_KEY environment variable (set via .env)
 class LLMManager():
     """
     Initialize NVIDIA LLM connection with API key.
@@ -52,10 +49,10 @@ class LLMManager():
         elif file_path:
             self.nvidia_key = read_gpg_encrypted_file(file_path)
             print("Using NVIDIA API key from encrypted file")
-        # Finally use the default key
+        # Finally fall back to the environment variable
         else:
-            self.nvidia_key = NVIDIA_API_KEY
-            print("Using default NVIDIA API key")
+            self.nvidia_key = os.environ.get("NVIDIA_API_KEY", "")
+            print("Using NVIDIA API key from environment variable")
         
         # Set environment variable for NVIDIA
         if self.nvidia_key:
