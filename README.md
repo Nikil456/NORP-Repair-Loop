@@ -1,7 +1,5 @@
 # NORP Repair Loop
 
-A FastAPI application that generates SQL queries from natural language using an LLM, with optional RAG and auto-correction.
-
 ## Prerequisites
 
 - Python 3.11+
@@ -15,7 +13,6 @@ A FastAPI application that generates SQL queries from natural language using an 
 
 ```bash
 git clone https://github.com/Nikil456/NORP-Repair-Loop.git
-cd NORP-Repair-Loop
 python -m pip install -r requirements.txt
 ```
 
@@ -61,8 +58,7 @@ python utils/setup_from_scratch.py
 python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8088
 ```
 
-The server will be available at `http://127.0.0.1:8088`.  
-Interactive API docs: `http://127.0.0.1:8088/docs`
+The server will be available at `http://127.0.0.1:8088`
 
 ## Sending a Query
 
@@ -91,9 +87,4 @@ Example response:
     "auto_correction_used": true
 }
 ```
-
-## Notes
-
-- For evaluation and result reproduction details, see [REPRODUCING_RESULTS.md](REPRODUCING_RESULTS.md)
-- For RAG setup details, see [rag/README.md](rag/README.md)
 
