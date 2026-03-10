@@ -1,21 +1,72 @@
-// ... existing code ...
+# NORP Repair Loop
 
-## Reproducing Results
+A FastAPI application that generates SQL queries from natural language using an LLM, with optional RAG and auto-correction.
 
-### 1. Launch the Application
+## Prerequisites
 
-Start the FastAPI server with the following command:
+- Python 3.11+
+- MySQL running locally
+- Redis running locally
+- NVIDIA and OpenAI API keys
+
+## Setup
+
+**1. Clone the repo and install dependencies**
 
 ```bash
-# From the project root directory
+git clone https://github.com/Nikil456/NORP-Repair-Loop.git
+cd NORP-Repair-Loop
+python -m pip install -r requirements.txt
+```
+
+**2. Configure environment variables**
+
+Copy the example env file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your credentials:
+
+```
+DB_URL=mysql+mysqlconnector://root:your_password@localhost/norp_db
+DB_USERNAME=your_db_username
+DB_PASSWORD=your_db_password
+REDIS_HOST_URL=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+OPENAI_API_KEY=your_openai_api_key
+NVIDIA_API_KEY=your_nvidia_api_key
+```
+
+**3. Start MySQL and Redis**
+
+```bash
+brew services start mysql
+brew services start redis
+```
+
+**4. Set up the database**
+
+Place CSV data files in `dataset/norp/csv/`, then run:
+
+```bash
+python utils/setup_from_scratch.py
+```
+
+**5. Start the server**
+
+```bash
 python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8088
 ```
 
-The server will be available at `http://127.0.0.1:8088`.
+The server will be available at `http://127.0.0.1:8088`.  
+Interactive API docs: `http://127.0.0.1:8088/docs`
 
-### 2. Test Individual Queries
+## Sending a Query
 
-You can test individual queries using curl:
+In a second terminal while the server is running:
 
 ```bash
 curl -X POST "http://127.0.0.1:8088/query" \
@@ -30,120 +81,19 @@ curl -X POST "http://127.0.0.1:8088/query" \
   }'
 ```
 
-Example Response:
+Example response:
+
 ```json
 {
     "sql_query": "SELECT area_name, COUNT(*) as crime_count FROM la_crime_data GROUP BY area_name",
-    "query_results": [...],
-    "natural_language_summary": "This query counts the number of crimes in each area of LA",
-    "correction_explanation": null,
-    "correction_metadata": null,
+    "query_results": "...",
+    "natural_language_summary": "This query counts the number of crimes in each area.",
     "auto_correction_used": true
 }
 ```
 
-### 3. Run Full Evaluation
+## Notes
 
-To reproduce the evaluation results shown in the paper:
+- For evaluation and result reproduction details, see [REPRODUCING_RESULTS.md](REPRODUCING_RESULTS.md)
+- For RAG setup details, see [rag/README.md](rag/README.md)
 
-1. **Prepare the Gold Dataset**
-   ```bash
-   # Create evaluation directory if it doesn't exist
-   mkdir -p evaluation/data
-   
-   # Download the gold dataset
-   wget https://example.com/gold_dataset.csv -O evaluation/data/gold_dataset.csv
-   ```
-
-2. **Run Basic Evaluation**
-   ```bash
-   python evaluation/run_eval.py \
-     evaluation/data/gold_dataset.csv \
-     evaluation/results/basic_results.csv
-   ```
-
-3. **Run Evaluation with Different Configurations**
-   ```bash
-   # RAG Only
-   python evaluation/run_eval.py \
-     evaluation/data/gold_dataset.csv \
-     evaluation/results/rag_results.csv \
-     --use-rag --no-auto-correction
-
-   # RAG + Auto-correction
-   python evaluation/run_eval.py \
-     evaluation/data/gold_dataset.csv \
-     evaluation/results/rag_auto_results.csv \
-     --use-rag --use-auto-correction
-   ```
-
-4. **Run Comprehensive Evaluation**
-   ```bash
-   python evaluation/evaluate.py \
-     --dataset evaluation/data/gold_dataset.csv \
-     --api-url "http://localhost:8088" \
-     --compare-rag \
-     --compare-auto-correction \
-     --output evaluation/results/comprehensive_results.json
-   ```
-
-### 4. Analyze Results
-
-The evaluation scripts produce several metrics:
-
-1. **Syntactical Correctness:**
-   - No RAG: 78.7%
-   - With RAG: 84.6%
-   - RAG + Auto-correction: 87.1%
-
-2. **Execution Success Rate:**
-   - Measures queries that execute without errors
-   - Shows improvement with RAG and further improvement with auto-correction
-
-3. **Result Quality:**
-   - Compares results with gold standard queries
-   - Evaluates both exact matches and semantic equivalence
-
-### 5. Checkpoint and Resume
-
-For long evaluation runs, you can use checkpointing:
-
-```bash
-python evaluation/evaluate.py \
-  --dataset evaluation/data/gold_dataset.csv \
-  --checkpoint evaluation/checkpoint.json \
-  --compare-rag \
-  --compare-auto-correction
-```
-
-If interrupted, resume from the last checkpoint:
-```bash
-python evaluation/evaluate.py \
-  --dataset evaluation/data/gold_dataset.csv \
-  --checkpoint evaluation/checkpoint.json \
-  --start-idx <last_index>
-```
-
-### 6. Troubleshooting Evaluation
-
-If you encounter issues during evaluation:
-
-1. **API Timeouts**
-   - Default timeout is 25 seconds per query
-   - Adjust with `--timeout` parameter
-   - Use `--max-retries` to control retry attempts
-
-2. **Memory Issues**
-   - Results are saved incrementally
-   - Use `--limit` to process subset of queries
-   - Monitor Redis memory usage
-
-3. **Connection Issues**
-   - Check MySQL connection settings
-   - Verify API server is running
-   - Check Redis connection
-
-4. **Common Error Messages**
-   - "API Error": Server not running or wrong port
-   - "MySQL Error": Database connection issues
-   - "Timeout Error": Increase timeout or check server load
