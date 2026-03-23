@@ -137,6 +137,39 @@ SQL_SUMMARY_TEMPLATE = ChatPromptTemplate.from_messages([
     ("human", "Original Question: {user_question}\n\nSQL Query:\n```sql\n{sql_query}\n```\n\nPlease provide a plain English summary of what this SQL query is doing."),
 ])
 
+
+# FinStat2SQL-style Refinement Prompt (for Repair Loop)
+FINSTAT_REFINE_PROMPT = """You are a SQL expert performing self-correction on a failed query.
+
+**Original User Question:** {question}
+
+**Database Schema Context:**
+{schema_context}
+
+**Previous Failed SQL Query:**
+```sql
+{previous_sql}
+```
+
+**Database Error Returned:**
+{error_message}
+
+**Previous Attempts History:**
+{attempt_history}
+
+**Instructions:**
+1. Think step-by-step about why the previous SQL query failed.
+2. Analyze the error message and schema to identify the root cause.
+3. Generate a corrected SQL query that fixes the issue.
+4. Ensure the new query uses ONLY tables and columns from the provided schema.
+
+**Output Format:**
+### Reasoning: {{Step-by-step explanation}}
+### Corrected SQL: ```sql
+{{Your corrected SQL query}}
+```
+"""
+
 # Week 10 Deliverable: Logic Verification Prompt (FinStat2SQL Self-Correction)
 # This prompt acts as the Logical Critic, verifying if a successfully executed query
 # matches the user's original intent, catching logical errors that syntactic checks miss.

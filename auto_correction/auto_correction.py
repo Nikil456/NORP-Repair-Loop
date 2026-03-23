@@ -1,3 +1,10 @@
+"""
+DEPRECATED: Replaced by the Multi-Agent Repair Loop in services/repair_loop/ as of Checkpoint 3.
+
+This module is kept for baseline comparison tests in Week 12 evaluation.
+Do not use for new development - use SelfCorrectionOrchestrator instead.
+"""
+
 from typing import Optional, Tuple, Dict, Any
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
