@@ -15,6 +15,9 @@ FINSTAT_REFINE_PROMPT = """You are a SQL expert performing self-correction on a 
 **Database Error Returned:**
 {error_message}
 
+**Logic Verification Feedback:**
+{logic_feedback}
+
 **Previous Attempts History:**
 {attempt_history}
 
