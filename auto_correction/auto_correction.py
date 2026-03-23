@@ -10,10 +10,12 @@ from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from langchain.memory import ConversationBufferMemory
 from config.prompts import SQL_CORRECTION_TEMPLATE, SQL_SELF_CHECK_TEMPLATE
+from .logic_verification_agent import logic_verification_agent
 from rag.rag import SchemaRAG
 import json
 import re
 import asyncio
+import logging
 
 # Constants for auto-correction
 MAX_CORRECTION_ATTEMPTS = 5
@@ -146,29 +148,73 @@ class AutoCorrection:
                     error_message = result
                     raise ValueError(error_message)
                 
-                # Query executed and returned results - perform self-check
-                self_check_result = await self.self_check_query(current_query, user_request, table_info)
-                
-                # Even if query executes, we need to verify both intent and result quality
-                if self_check_result["matches_intent"]:
-                    # Additional validation of results
-                    if isinstance(result, (list, dict)) and not result:
-                        error_message = "Query executed but returned empty results. This might indicate overly restrictive conditions."
-                        raise ValueError(error_message)
+                # Query executed and returned results
+                # Week 10 Integration: Perform Logic Verification (FinStat2SQL Logical Critic)
+                try:
+                    logic_verification_passed, new_sql_suggestion, verification_metadata = await self.logic_verify_query(
+                        sql_query=current_query,
+                        user_request=user_request,
+                        execution_result=result
+                    )
                     
-                    # Success case - we have valid results and matching intent
-                    return current_query, "Query executed successfully with valid results", {
-                        "attempts": attempts + 1,
-                        "correction_history": correction_history,
-                        "self_check": self_check_result,
-                        "result_sample": str(result)[:200] if result else "No results",
-                        # "final_result": result,
-                        "table_info_used": bool(table_info)
-                    }
-                else:
-                    # Query executed but doesn't match intent
-                    error_message = f"Query executed but may not match intent: {self_check_result['potential_issues']}"
-                    raise ValueError(error_message)
+                    if logic_verification_passed:
+                        # Logic verification passed - query is correct and matches intent
+                        print("Logic Verification Passed: Query matches user intent and returns valid results.")
+                        return current_query, "Query executed successfully with valid results", {
+                            "attempts": attempts + 1,
+                            "correction_history": correction_history,
+                            "logic_verification": verification_metadata,
+                            "result_sample": str(result)[:200] if result else "No results",
+                            "table_info_used": bool(table_info)
+                        }
+                    else:
+                        # Logic verification failed - query structure is valid but doesn't match intent
+                        print(f"Logic Verification Failed: {verification_metadata.get('explanation', 'Query does not match intent')}")
+                        
+                        if new_sql_suggestion and new_sql_suggestion.strip():
+                            # Logic verifier suggested a corrected query - feed it back into the loop
+                            error_message = f"Logic Verification Failed: {verification_metadata.get('explanation', 'Query does not match intent')}"
+                            correction_history.append({
+                                "attempt": attempts + 1,
+                                "error": error_message,
+                                "error_type": "LOGIC_ERROR",
+                                "correction": new_sql_suggestion,
+                                "explanation": verification_metadata.get('explanation', 'Logical correction suggested'),
+                                "table_info_used": bool(table_info)
+                            })
+                            current_query = new_sql_suggestion
+                            attempts += 1
+                            continue  # Re-enter the loop to verify the corrected query
+                        else:
+                            # No SQL suggestion but still failed - use self-check fallback
+                            error_message = f"Logic Verification Failed: {verification_metadata.get('explanation', 'Query does not match intent')}"
+                            raise ValueError(error_message)
+                    
+                except Exception as logic_error:
+                    # If logic verification itself fails, fall back to self-check
+                    print(f"Logic Verification error (falling back to self-check): {str(logic_error)}")
+                    self_check_result = await self.self_check_query(current_query, user_request, table_info)
+                    
+                    # Even if query executes, we need to verify both intent and result quality
+                    if self_check_result["matches_intent"]:
+                        # Additional validation of results
+                        if isinstance(result, (list, dict)) and not result:
+                            error_message = "Query executed but returned empty results. This might indicate overly restrictive conditions."
+                            raise ValueError(error_message)
+                        
+                        # Success case - we have valid results and matching intent
+                        return current_query, "Query executed successfully with valid results", {
+                            "attempts": attempts + 1,
+                            "correction_history": correction_history,
+                            "self_check": self_check_result,
+                            "result_sample": str(result)[:200] if result else "No results",
+                            "table_info_used": bool(table_info),
+                            "logic_verification_fallback": True
+                        }
+                    else:
+                        # Query executed but doesn't match intent
+                        error_message = f"Query executed but may not match intent: {self_check_result['potential_issues']}"
+                        raise ValueError(error_message)
                     
             except Exception as e:
                 last_error = str(e)
@@ -324,4 +370,41 @@ class AutoCorrection:
             else:
                 raise Exception("Self-check LLM call failed after retries for unknown reason.")
 
-        return self._parse_self_check_response(check_response.content) 
+        return self._parse_self_check_response(check_response.content)
+    
+    async def logic_verify_query(
+        self, 
+        sql_query: str, 
+        user_request: str, 
+        execution_result: Any,
+        timeout_seconds: int = 25,
+        max_retries: int = 3
+    ) -> Tuple[bool, str, Dict[str, Any]]:
+        """
+        Week 10 Deliverable: Logic Verification Agent (FinStat2SQL Logical Critic)
+        
+        Verifies if a successfully executed SQL query matches the user's original intent.
+        This catches logical errors that syntactic checks miss (e.g., empty results, 
+        queries that don't capture user intent).
+        
+        Args:
+            sql_query: The SQL query that was executed
+            user_request: The original user request in natural language
+            execution_result: The result returned from executing the query
+            timeout_seconds: Timeout for LLM call (default 25 seconds)
+            max_retries: Maximum retry attempts for LLM call (default 3)
+            
+        Returns:
+            Tuple containing:
+            - matches_intent (bool): Whether the query matches user intent
+            - new_sql (str): Corrected SQL if needed (empty string if no correction)
+            - metadata (dict): Verification metadata including explanation and potential issues
+        """
+        return await logic_verification_agent(
+            current_sql=sql_query,
+            user_query=user_request,
+            execution_result=execution_result,
+            llm_client=self.llm,
+            timeout_seconds=timeout_seconds,
+            max_retries=max_retries
+        )

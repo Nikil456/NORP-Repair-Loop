@@ -213,8 +213,12 @@ curl -X POST http://127.0.0.1:8088/query \
 4. LLM generates SQL
 5. Execute SQL against MySQL via `DatabaseManager`
 6. If SQL fails, `AutoCorrection` loop retries up to 5 times with error feedback to LLM
-7. Format results into a natural-language response
-8. Store updated conversation in Redis
+7. **{NEW} Week 10: Logic Verification Agent** — If SQL succeeds, verify it matches user intent using the FinStat2SQL Logical Critic:
+   - Checks if the query result is empty or doesn't capture the user's intent
+   - Suggests logical corrections if the query structure is correct but semantically wrong
+   - Returns results if verification passes; otherwise feeds corrected SQL back into correction loop
+8. Format results into a natural-language response
+9. Store updated conversation in Redis
 
 ---
 
@@ -223,8 +227,9 @@ curl -X POST http://127.0.0.1:8088/query \
 | File | Purpose |
 |---|---|
 | `app/app.py` | FastAPI app, config loading, `/query` route handler |
-| `config/prompts.py` | All prompt templates: `SQL_GENERATION_TEMPLATE`, `SQL_CORRECTION_TEMPLATE`, `SQL_SELF_CHECK_TEMPLATE`, `SUMMARY_TEMPLATE` |
+| `config/prompts.py` | All prompt templates: `SQL_GENERATION_TEMPLATE`, `SQL_CORRECTION_TEMPLATE`, `SQL_SELF_CHECK_TEMPLATE`, `LOGIC_VERIFICATION_PROMPT_TEMPLATE`, `SUMMARY_TEMPLATE` |
 | `auto_correction/auto_correction.py` | `AutoCorrection` class — iterative SQL fix loop |
+| `auto_correction/logic_verification_agent.py` | **{NEW} Week 10:** `LogicVerificationAgent` class — FinStat2SQL Logical Critic for intent verification |
 | `rag/rag.py` | `SchemaRAG` class — Chroma vector DB retrieval |
 | `services/service_manager.py` | `ServiceManager` — initializes DB, LLM, Redis |
 | `services/llm_manager/LLMManager.py` | Wraps `ChatNVIDIA` with API key from env |
@@ -232,6 +237,110 @@ curl -X POST http://127.0.0.1:8088/query \
 | `services/redis_manager/RedisManager.py` | Redis client for conversation history |
 | `utils/setup_from_scratch.py` | One-shot setup: MySQL tables + Chroma DB |
 | `dataset/norp/schemas/` | 25 `.txt` files with `CREATE TABLE` SQL — used for RAG context |
+
+---
+
+## Week 10 Deliverable: Logic Verification Agent (FinStat2SQL Logical Critic)
+
+The **Logic Verification Agent** is a new component implementing the FinStat2SQL paper's Logical Critic methodology. It addresses a critical gap in the auto-correction pipeline: **catching logical errors where syntactically correct queries don't match the user's intent**.
+
+### Motivation
+
+The naive auto-correction loop (Week 9) catches syntax errors (unknown columns, bad table names). However, it misses **logical errors** such as:
+- Query returns empty results when it shouldn't
+- Query structure is valid but doesn't capture user intent
+- Wrong aggregation or filtering logic
+
+The Logic Verification Agent runs after successful execution to verify semantic correctness.
+
+### Implementation Architecture
+
+**Location:** [auto_correction/logic_verification_agent.py](auto_correction/logic_verification_agent.py)
+
+**Core class:** `LogicVerificationAgent`
+- **Input:** Executed SQL query, user's natural language request, execution result
+- **Output:** 
+  - `matches_intent` (bool) — Does the query result satisfy the user's intent?
+  - `new_sql` (str) — Suggested correction if intent doesn't match (optional)
+  - `verification_metadata` (dict) — Explanation and potential issues
+
+**Integration point:** Called in `AutoCorrection.correct_query()` after successful SQL execution
+
+```python
+# In auto_correction.py, after SQL executes successfully:
+matches_intent, new_sql, verification_metadata = await auto_correction.logic_verify_query(
+    sql_query=current_query,
+    user_request=user_request,
+    execution_result=result
+)
+```
+
+### The FinStat2SQL Prompt Template
+
+The agent uses a structured prompt (from `config/prompts.py`):
+
+```
+<task> {user_query} </task>
+<result> {sql_result} </result>
+
+Based on the SQL table result in <result> tag, do you think the SQL query is correct?
+- If no result: query is incorrect (returns nothing when it shouldn't)
+- If result matches intent: return YES
+- Otherwise: return NO, provide reasoning, and suggest corrected SQL
+
+Return format:
+### Decision: {YES|NO}
+### Reasoning: {explanation}
+### SQL Query: {corrected query if NO}
+```
+
+### Pipeline Integration
+
+When a query executes successfully:
+
+1. **Syntax Check** ← Already passed (no SQL errors)
+2. **Logic Verification** (NEW Week 10)
+   - Call LLM as Logical Critic
+   - Check if result matches user intent
+   - If intent matches → Return success
+   - If intent doesn't match → Suggest correction → Feed back to auto-correction loop
+3. **Response formatting** → Return to user
+
+### Fallback Behavior
+
+If the Logic Verification Agent itself fails (LLM timeout, parse error):
+- Falls back to the legacy `self_check_query()` method
+- Logs `logic_verification_fallback = True` in response metadata
+
+### Example Usage
+
+```python
+from auto_correction.logic_verification_agent import LogicVerificationAgent
+
+# Initialize agent
+agent = LogicVerificationAgent(llm_client)
+
+# Verify a query
+matches_intent, new_sql, metadata = await agent.verify(
+    current_sql="SELECT * FROM demographic_race WHERE state='GA'",
+    user_query="How many people of each race live in Georgia?",
+    execution_result=[
+        {"state": "GA", "race": "White", "count": 5000},
+        {"state": "GA", "race": "Black", "count": 3000}
+    ]
+)
+
+# Output:
+# matches_intent = True
+# new_sql = ""
+# metadata = {"explanation": "Query correctly...", "matches_intent": True, "potential_issues": []}
+```
+
+### Configuration
+
+**Timeout:** 25 seconds (configurable per call)
+**Retry attempts:** 3 retries on timeout (configurable)
+**Output format:** Structured markdown with `### Decision:`, `### Reasoning:`, `### SQL Query:` sections
 
 ---
 
@@ -245,6 +354,7 @@ python -m pytest tests/
 python tests/test_llm_manager.py
 python tests/test_rag.py
 python tests/test_redis_conn.py
+python tests/test_logic_verification_agent.py  # NEW Week 10: Logic Verification Agent tests
 ```
 
 ### Manual API test:
@@ -279,7 +389,9 @@ Full `CREATE TABLE` statements for all 25 tables are in `dataset/norp/schemas/*.
 
 3. **`await` bug in auto_correction.py line ~129**: `execute_query_func` is called without `await` in an async context. This is a pre-existing bug from the original repo — it causes a `RuntimeWarning` but execution continues synchronously.
 
-4. **OpenAI vs NVIDIA**: `auto_correction/auto_correction.py` imports `ChatOpenAI` from LangChain (legacy). The main query flow uses NVIDIA LLM. Both `OPENAI_API_KEY` and `NVIDIA_API_KEY` must be set.
+4. **OpenAI dependency in auto_correction.py**: `auto_correction/auto_correction.py` imports `ChatOpenAI` from LangChain (legacy). The main query flow and new Logic Verification Agent use NVIDIA LLM. Both `OPENAI_API_KEY` and `NVIDIA_API_KEY` must be set for full functionality.
+
+5. **{NEW Week 10} Logic Verification Agent fallback**: If the Logic Verification Agent fails (LLM timeout, parsing error), it gracefully falls back to the legacy `self_check_query()` method and logs `logic_verification_fallback = True`. This ensures the pipeline always returns results without breaking.
 
 ---
 

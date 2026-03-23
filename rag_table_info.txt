@@ -9668,3 +9668,5323 @@ Relationships: No explicit relationships defined.
 --------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)COLLATE utf8mb4_unicode_ci ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)ENGINE=InnoDB COLLATE utf8mb4_unicode_ci DEFAULT CHARSET=utf8mb4
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------
+
+CREATE TABLE atlanta_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Day_Occurred` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from atlanta_crime_data table:
+Crime_ID	Report_Number	Day_Occurred	Crime_Date	Crime_Time	Crime_Type	Area_Name	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE demographic_race (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Race_Total_Population` INTEGER, 
+	`One_Race` INTEGER, 
+	`Two_Or_More_Races` INTEGER, 
+	`White` INTEGER, 
+	`Black` INTEGER, 
+	`American_Indian_And_Alaska_Native` INTEGER, 
+	`Asian` INTEGER, 
+	`Native_Hawaiian_And_Other_Pacific_Islander` INTEGER, 
+	`Some_Other_Race` INTEGER, 
+	`Hispanic_Or_Latino_Total` INTEGER, 
+	`Hispanic_Or_Latino` INTEGER, 
+	`Not_Hispanic_Or_Latino` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from demographic_race table:
+Year	ID	Zipcode	Race_Total_Population	One_Race	Two_Or_More_Races	White	Black	American_Indian_And_Alaska_Native	Asian	Native_Hawaiian_And_Other_Pacific_Islander	Some_Other_Race	Hispanic_Or_Latino_Total	Hispanic_Or_Latino	Not_Hispanic_Or_Latino
+
+*/
+
+
+CREATE TABLE demographics_basics (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`Total_Population_Male` INTEGER, 
+	`Total_Population_Female` INTEGER, 
+	`Total_Population_Sex_Ratio` FLOAT, 
+	`Total_Population_Median_Age` FLOAT, 
+	`Total_Housing_Units` INTEGER, 
+	`Voting_Age_Population` INTEGER, 
+	`Voting_Age_Population_Male` INTEGER, 
+	`Voting_Age_Population_Female` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from demographics_basics table:
+Year	ID	Zipcode	Total_Population	Total_Population_Male	Total_Population_Female	Total_Population_Sex_Ratio	Total_Population_Median_Age	Total_Housing_Units	Voting_Age_Population	Voting_Age_Population_Male	Voting_Age_Population_Female
+
+*/
+
+
+CREATE TABLE economic_commute_to_work (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Workers` INTEGER, 
+	`Car_Alone` INTEGER, 
+	`Car_Pool` INTEGER, 
+	`Public_Transport` INTEGER, 
+	`Walk` INTEGER, 
+	`Other` INTEGER, 
+	`Work_From_Home` INTEGER, 
+	`Mean_Travel_Time` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_commute_to_work table:
+Year	ID	Zipcode	Total_Workers	Car_Alone	Car_Pool	Public_Transport	Walk	Other	Work_From_Home	Mean_Travel_Time
+
+*/
+
+
+CREATE TABLE economic_health_insurance (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Population` INTEGER, 
+	`With_Health_Insurance` INTEGER, 
+	`No_Health_Insurance` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_health_insurance table:
+Year	ID	Zipcode	Total_Population	With_Health_Insurance	No_Health_Insurance
+
+*/
+
+
+CREATE TABLE economic_income_and_benefits (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`Median_Household_Income` FLOAT, 
+	`Mean_Household_Income` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from economic_income_and_benefits table:
+Year	ID	Zipcode	Total_Households	Median_Household_Income	Mean_Household_Income
+
+*/
+
+
+CREATE TABLE experiencing_homelessness_age_demographics (
+	`CALENDAR_YEAR` VARCHAR(10) COLLATE utf8mb4_unicode_ci, 
+	`LOCATION` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`AGE_GROUP_PUBLIC` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`EXPERIENCING_HOMELESSNESS_CNT` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from experiencing_homelessness_age_demographics table:
+CALENDAR_YEAR	LOCATION	AGE_GROUP_PUBLIC	EXPERIENCING_HOMELESSNESS_CNT
+
+*/
+
+
+CREATE TABLE food_access (
+	`CensusTract` BIGINT, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Urban` TINYINT(1), 
+	`Pop2010` INTEGER, 
+	`Ohu2010` INTEGER, 
+	`LILATracts_1And10` TINYINT(1), 
+	`LILATracts_halfAnd10` TINYINT(1), 
+	`LILATracks_1And20` TINYINT(1), 
+	`LILATractsVehicle` TINYINT(1), 
+	`HUNVFlag` TINYINT(1), 
+	`LowIncomeTracts` TINYINT(1), 
+	`PovertyRate` FLOAT, 
+	`MedianFamilyIncome` FLOAT, 
+	`LA1and10` TINYINT(1), 
+	`LAhalfand10` TINYINT(1), 
+	`LA1and20` TINYINT(1), 
+	`LATracts_half` TINYINT(1), 
+	`LATracts1` TINYINT(1), 
+	`LATracts10` TINYINT(1), 
+	`LATracts20` TINYINT(1), 
+	`LATractsVehicle_20` TINYINT(1), 
+	`LAPOP1_10` FLOAT, 
+	`LAPOP05_10` FLOAT, 
+	`LAPOP1_20` FLOAT, 
+	`LALOWI1_10` FLOAT, 
+	`LALOWI05_10` FLOAT, 
+	`LALOWI1_20` FLOAT, 
+	lapophalf FLOAT, 
+	lalowihalf FLOAT, 
+	lakidshalf FLOAT, 
+	laseniorshalf FLOAT, 
+	lawhitehalf FLOAT, 
+	lablackhalf FLOAT, 
+	laasianhalf FLOAT, 
+	lanhopihalf FLOAT, 
+	laaianhalf FLOAT, 
+	laomultirhalf FLOAT, 
+	lahisphalf FLOAT, 
+	lahunvhalf FLOAT, 
+	lasnaphalf FLOAT, 
+	lapop1 FLOAT, 
+	lalowi1 FLOAT, 
+	lakids1 FLOAT, 
+	laseniors1 FLOAT, 
+	lawhite1 FLOAT, 
+	lablack1 FLOAT, 
+	laasian1 FLOAT, 
+	lanhopi1 FLOAT, 
+	laaian1 FLOAT, 
+	laomultir1 FLOAT, 
+	lahisp1 FLOAT, 
+	lahunv1 FLOAT, 
+	lasnap1 FLOAT, 
+	lapop10 FLOAT, 
+	lalowi10 FLOAT, 
+	lakids10 FLOAT, 
+	laseniors10 FLOAT, 
+	lawhite10 FLOAT, 
+	lablack10 FLOAT, 
+	laasian10 FLOAT, 
+	lanhopi10 FLOAT, 
+	laaian10 FLOAT, 
+	laomultir10 FLOAT, 
+	lahisp10 FLOAT, 
+	lahunv10 FLOAT, 
+	lasnap10 FLOAT, 
+	lapop20 FLOAT, 
+	lalowi20 FLOAT, 
+	lakids20 FLOAT, 
+	laseniors20 FLOAT, 
+	lawhite20 FLOAT, 
+	lablack20 FLOAT, 
+	laasian20 FLOAT, 
+	lanhopi20 FLOAT, 
+	laaian20 FLOAT, 
+	laomultir20 FLOAT, 
+	lahisp20 FLOAT, 
+	lahunv20 FLOAT, 
+	lasnap20 FLOAT, 
+	`TractLOWI` FLOAT, 
+	`TractKids` FLOAT, 
+	`TractSeniors` FLOAT, 
+	`TractWhite` FLOAT, 
+	`TractBlack` FLOAT, 
+	`TractAsian` FLOAT, 
+	`TractNHOPI` FLOAT, 
+	`TractAIAN` FLOAT, 
+	`TractOMultir` FLOAT, 
+	`TractHispanic` FLOAT, 
+	`TractHUNV` FLOAT, 
+	`TractSNAP` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from food_access table:
+CensusTract	State	County	Urban	Pop2010	Ohu2010	LILATracts_1And10	LILATracts_halfAnd10	LILATracks_1And20	LILATractsVehicle	HUNVFlag	LowIncomeTracts	PovertyRate	MedianFamilyIncome	LA1and10	LAhalfand10	LA1and20	LATracts_half	LATracts1	LATracts10	LATracts20	LATractsVehicle_20	LAPOP1_10	LAPOP05_10	LAPOP1_20	LALOWI1_10	LALOWI05_10	LALOWI1_20	lapophalf	lalowihalf	lakidshalf	laseniorshalf	lawhitehalf	lablackhalf	laasianhalf	lanhopihalf	laaianhalf	laomultirhalf	lahisphalf	lahunvhalf	lasnaphalf	lapop1	lalowi1	lakids1	laseniors1	lawhite1	lablack1	laasian1	lanhopi1	laaian1	laomultir1	lahisp1	lahunv1	lasnap1	lapop10	lalowi10	lakids10	laseniors10	lawhite10	lablack10	laasian10	lanhopi10	laaian10	laomultir10	lahisp10	lahunv10	lasnap10	lapop20	lalowi20	lakids20	laseniors20	lawhite20	lablack20	laasian20	lanhopi20	laaian20	laomultir20	lahisp20	lahunv20	lasnap20	TractLOWI	TractKids	TractSeniors	TractWhite	TractBlack	TractAsian	TractNHOPI	TractAIAN	TractOMultir	TractHispanic	TractHUNV	TractSNAP
+
+*/
+
+
+CREATE TABLE household_income_percent_with_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from household_income_percent_with_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE household_income_percent_without_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from household_income_percent_without_mortgage table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_gross_rent_percent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Income_Percent_Min` INTEGER, 
+	`Income_Percent_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_gross_rent_percent table:
+Year	ID	Zipcode	Number_Of_Units	Income_Percent_Min	Income_Percent_Max
+
+*/
+
+
+CREATE TABLE housing_heating_fuel (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Heating_Units` INTEGER, 
+	`Utility_Gas` INTEGER, 
+	`Bottled_Tank_Or_Lp_Gas` INTEGER, 
+	`Electricity` INTEGER, 
+	`Fuel_Oil_Kerosene` INTEGER, 
+	`Coal_Or_Coke` INTEGER, 
+	`Wood` INTEGER, 
+	`Solar_Energy` INTEGER, 
+	`Other_Fuel` INTEGER, 
+	`No_Fuel_Used` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_heating_fuel table:
+Year	ID	Zipcode	Total_Heating_Units	Utility_Gas	Bottled_Tank_Or_Lp_Gas	Electricity	Fuel_Oil_Kerosene	Coal_Or_Coke	Wood	Solar_Energy	Other_Fuel	No_Fuel_Used
+
+*/
+
+
+CREATE TABLE housing_mortgage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Units_With_Mortgage` INTEGER, 
+	`Units_Without_Mortgage` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_mortgage table:
+Year	ID	Zipcode	Units_With_Mortgage	Units_Without_Mortgage
+
+*/
+
+
+CREATE TABLE housing_rent (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Rent_Value_Min` INTEGER, 
+	`Rent_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_rent table:
+Year	ID	Zipcode	Number_Of_Units	Rent_Value_Min	Rent_Value_Max
+
+*/
+
+
+CREATE TABLE housing_value (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`House_Value_Min` INTEGER, 
+	`House_Value_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_value table:
+Year	ID	Zipcode	Number_Of_Units	House_Value_Min	House_Value_Max
+
+*/
+
+
+CREATE TABLE housing_year_built (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Number_Of_Units` INTEGER, 
+	`Year_Built_Min` INTEGER, 
+	`Year_Built_Max` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from housing_year_built table:
+Year	ID	Zipcode	Number_Of_Units	Year_Built_Min	Year_Built_Max
+
+*/
+
+
+CREATE TABLE la_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Date_Reported` DATE, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Vict_Age` INTEGER, 
+	`Vict_Sex` CHAR(1) COLLATE utf8mb4_unicode_ci, 
+	`Weapon_Desc` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from la_crime_data table:
+Crime_ID	Report_Number	Date_Reported	Crime_Date	Crime_Time	Crime_Type	Area_Name	Vict_Age	Vict_Sex	Weapon_Desc	Address	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE nyc_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Class` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Name` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Latitude` FLOAT, 
+	`Longitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from nyc_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Class	Crime_Type	Area_Name	Latitude	Longitude
+
+*/
+
+
+CREATE TABLE philly_crime_data (
+	`Crime_ID` INTEGER, 
+	`Report_Number` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`Crime_Date` DATE, 
+	`Crime_Time` TIME, 
+	`Crime_Type` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Area_Number` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`Longitude` FLOAT, 
+	`Latitude` FLOAT
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from philly_crime_data table:
+Crime_ID	Report_Number	Crime_Date	Crime_Time	Crime_Type	Area_Number	Address	Longitude	Latitude
+
+*/
+
+
+CREATE TABLE social_citizenship_status (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Foreign_Born_Population` INTEGER, 
+	`Naturalized_Us_Citizen` INTEGER, 
+	`Not_A_Us_Citizen` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_citizenship_status table:
+Year	ID	Zipcode	Foreign_Born_Population	Naturalized_Us_Citizen	Not_A_Us_Citizen
+
+*/
+
+
+CREATE TABLE social_computer_internet_usage (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Total_Households` INTEGER, 
+	`With_A_Computer` INTEGER, 
+	`With_Broadband_Internet_Subscription` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_computer_internet_usage table:
+Year	ID	Zipcode	Total_Households	With_A_Computer	With_Broadband_Internet_Subscription
+
+*/
+
+
+CREATE TABLE social_education_attainment (
+	`Year` INTEGER, 
+	`ID` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`Zipcode` VARCHAR(20) COLLATE utf8mb4_unicode_ci, 
+	`Population_25_Years_And_Over` INTEGER, 
+	`Less_Than_9th_Grade` INTEGER, 
+	`No_Diploma_9th_To_12th_Grade` INTEGER, 
+	`High_School_Graduate` INTEGER, 
+	`Some_College_No_Degree` INTEGER, 
+	`Associate_Degree` INTEGER, 
+	`Bachelors_Degree` INTEGER, 
+	`Graduate_Or_Professional_Degree` INTEGER, 
+	`High_School_Graduate_Or_Higher` INTEGER, 
+	`Bachelors_Degree_Or_Higher` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from social_education_attainment table:
+Year	ID	Zipcode	Population_25_Years_And_Over	Less_Than_9th_Grade	No_Diploma_9th_To_12th_Grade	High_School_Graduate	Some_College_No_Degree	Associate_Degree	Bachelors_Degree	Graduate_Or_Professional_Degree	High_School_Graduate_Or_Higher	Bachelors_Degree_Or_Higher
+
+*/
+
+
+CREATE TABLE us_population (
+	`CensurYear` INTEGER, 
+	`State` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`PopulationCount` INTEGER
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_population table:
+CensurYear	State	PopulationCount
+
+*/
+
+
+CREATE TABLE us_population_county (
+	`PopulationCount` INTEGER, 
+	`County` VARCHAR(100) COLLATE utf8mb4_unicode_ci
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_population_county table:
+PopulationCount	County
+
+*/
+
+
+CREATE TABLE us_shootings (
+	`IncidentID` INTEGER NOT NULL, 
+	`Address` LONGTEXT COLLATE utf8mb4_unicode_ci, 
+	`IncidentDate` DATE, 
+	`State` VARCHAR(50) COLLATE utf8mb4_unicode_ci, 
+	`CityOrCountry` VARCHAR(100) COLLATE utf8mb4_unicode_ci, 
+	`VictimsKilled` INTEGER, 
+	`VictimsInjured` INTEGER, 
+	`SuspectsInjured` INTEGER, 
+	`SuspectsKilled` INTEGER, 
+	`SuspectsArrested` INTEGER, 
+	PRIMARY KEY (`IncidentID`)
+)DEFAULT CHARSET=utf8mb4 ENGINE=InnoDB COLLATE utf8mb4_unicode_ci
+
+/*
+3 rows from us_shootings table:
+IncidentID	Address	IncidentDate	State	CityOrCountry	VictimsKilled	VictimsInjured	SuspectsInjured	SuspectsKilled	SuspectsArrested
+
+*/
+--------------------------------------------------------------------------------

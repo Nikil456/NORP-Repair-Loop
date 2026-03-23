@@ -137,6 +137,7 @@ SQL_SUMMARY_TEMPLATE = ChatPromptTemplate.from_messages([
     ("human", "Original Question: {user_question}\n\nSQL Query:\n```sql\n{sql_query}\n```\n\nPlease provide a plain English summary of what this SQL query is doing."),
 ])
 
+
 # FinStat2SQL-style Refinement Prompt (for Repair Loop)
 FINSTAT_REFINE_PROMPT = """You are a SQL expert performing self-correction on a failed query.
 
@@ -168,3 +169,28 @@ FINSTAT_REFINE_PROMPT = """You are a SQL expert performing self-correction on a 
 {{Your corrected SQL query}}
 ```
 """
+
+# Week 10 Deliverable: Logic Verification Prompt (FinStat2SQL Self-Correction)
+# This prompt acts as the Logical Critic, verifying if a successfully executed query
+# matches the user's original intent, catching logical errors that syntactic checks miss.
+LOGIC_VERIFICATION_PROMPT = """
+<task> {user_query} </task>
+<result> {sql_result} </result>
+
+<correction>
+Based on the SQL table result in <result> tag, do you think the SQL queries is correct and can fully answer the original task? 
+
+If there is no SQL Result table on <result> tag, it means the previous queries return nothing, which is incorrect. 
+
+If the result of SQL query is correct and the table is suitable for <task> request, you only need to return YES under *Decision* heading. You must not provide the SQL query again. 
+
+Otherwise, return No under *Decision* heading, think step-by-step under *Reasoning* heading again and generate the correct SQL query under *SQL Query*. 
+
+Return in the following format (### SQL Query is optional):
+### Decision: {{Your decision}}
+### Reasoning: {{Your reasoning}}
+### SQL Query: {{Corrected SQL query}}
+</correction>
+"""
+
+LOGIC_VERIFICATION_PROMPT_TEMPLATE = ChatPromptTemplate.from_template(LOGIC_VERIFICATION_PROMPT)

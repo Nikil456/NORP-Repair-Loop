@@ -1,9 +1,9 @@
 {
-  "db_url": "mysql+mysqlconnector://root:root@localhost/norp_db",
+  "db_url": "mysql+mysqlconnector://root:@localhost/norp_db",
   "db_username": "root",
-  "db_password": "root",
+  "db_password": "",
   "redis_host_url": "localhost",
   "redis_port": "6379",
   "redis_password": null,
-  "openai_api_key": "REDACTED"
+  "openai_api_key": ""
 }
