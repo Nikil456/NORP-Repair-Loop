@@ -29,6 +29,7 @@ from langchain_core.runnables.base import RunnableLambda
 from utils.constants import *
 from config.prompts import *
 from auto_correction.auto_correction import AutoCorrection
+from services.repair_loop import SelfCorrectionOrchestrator
 from fastapi.concurrency import run_in_threadpool
 
 # Import RAG if available
@@ -387,110 +388,79 @@ async def handle_query(request: Request):
     memory = get_message_history(chat_request.session_id)
     natural_language_summary = "Could not generate summary." # Default value
     
-    # Initialize auto-correction if enabled
-    auto_correction = AutoCorrection(llm, execute_sql_query) if chat_request.use_auto_correction else None
+    # Initialize the Repair Loop Orchestrator
+    orchestrator = SelfCorrectionOrchestrator(
+        llm=llm,
+        db=db,
+        redis_client=redis_client,
+        max_retries=3,
+        use_rag=chat_request.use_rag,
+        redis_ttl=CHAT_HISTORY_TTL,
+    )
     
-    # Invoke the chain with the question
-    print("Attempting to generate initial SQL...")
+    # Invoke the orchestrator with the question
+    print("Attempting SQL generation with Repair Loop...")
     try:
-        sql_query_response, memory = await run_sql_chain(
-            chat_request.message,
-            memory.load_memory_variables({})["history"],
-            chat_request.session_id,
-            memory,
-            chat_request.use_rag
+        orchestrator_result = await orchestrator.execute(
+            question=chat_request.message,
+            session_id=str(chat_request.session_id),
         )
     except Exception as e:
-        print(f"Error during initial SQL generation: {e}")
-        print(e)
+        print(f"Error during SQL generation: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
-    print("Initial SQL generated successfully.")
-    # Extract the raw SQL query string
-    content = sql_query_response.content
-    if content.startswith('```sql') and content.endswith('```'):
-        initial_sql_query = content[6:-3].strip()
-    else:
-        initial_sql_query = content.strip()
-
-    final_sql_query = initial_sql_query # Default to initial query
+    final_sql_query = orchestrator_result.get("sql_query")
+    query_results = orchestrator_result.get("query_result")
+    success = orchestrator_result.get("success", False)
+    attempts = orchestrator_result.get("attempts", 1)
+    
+    if not success:
+        error_msg = orchestrator_result.get("error", "Unknown error")
+        print(f"Repair loop failed after {attempts} attempts: {error_msg}")
+        return {
+            "sql_query": final_sql_query,
+            "query_results": f"Error: {error_msg}",
+            "natural_language_summary": None,
+            "auto_correction_used": True,
+            "attempts": attempts,
+            "success": False,
+        }
+    
+    print(f"SQL generated successfully after {attempts} attempt(s).")
     
     try:
-        if chat_request.use_auto_correction and auto_correction:
-            print("Attempting auto-correction...")
-            # Try to execute the query with auto-correction
-            corrected_query, correction_explanation, correction_metadata = await auto_correction.correct_query(
-                initial_sql_query,
-                "",  # No initial error message
-                chat_request.message
-            )
-            final_sql_query = corrected_query # Update final query if corrected
-            print(f"Auto-correction completed. Corrected query: {final_sql_query}")
-            
-            # Execute the final query
-            print("Executing final (corrected) SQL query...")
-            query_results = await execute_sql_query(final_sql_query)
-            print("Final (corrected) SQL query executed.")
-            
-            # Generate summary for the corrected query if enabled
-            if chat_request.generate_summary:
-                try:
-                    summary_messages = SQL_SUMMARY_TEMPLATE.format_messages(
-                        user_question=chat_request.message,
-                        sql_query=final_sql_query
-                    )
-                    summary_response = await llm.ainvoke(summary_messages)
-                    natural_language_summary = summary_response.content
-                    print("Generated summary for corrected query.")
-                except Exception as summary_error:
-                    print(f"Error generating summary: {summary_error}")
-
-            # Update the response with correction information and summary
-            return {
-                "sql_query": final_sql_query,
-                "query_results": query_results,
-                "natural_language_summary": natural_language_summary if chat_request.generate_summary else None,
-                "correction_explanation": correction_explanation,
-                "correction_metadata": correction_metadata,
-                "auto_correction_used": True
-            }
-        else:
-            # Execute query without auto-correction
-            final_sql_query = initial_sql_query # Final query is the initial one
-            print("Executing initial SQL query (no auto-correction)...")
-            query_results = await execute_sql_query(final_sql_query)
-            print("Initial SQL query executed (no auto-correction).")
-
-            # Generate summary for the initial query if enabled
-            if chat_request.generate_summary:
-                try:
-                    summary_messages = SQL_SUMMARY_TEMPLATE.format_messages(
-                        user_question=chat_request.message,
-                        sql_query=final_sql_query
-                    )
-                    summary_response = await llm.ainvoke(summary_messages)
-                    natural_language_summary = summary_response.content
-                    print("Generated summary for initial query.")
-                except Exception as summary_error:
-                    print(f"Error generating summary: {summary_error}")
-                
-            return {
-                "sql_query": final_sql_query,
-                "query_results": query_results,
-                "natural_language_summary": natural_language_summary if chat_request.generate_summary else None,
-                "auto_correction_used": False
-            }
-            
-    except Exception as e:
-        print(f"Error executing query or generating summary: {e}")
-        # Attempt to return basic info even if execution/summary fails
-        print(f"Returning response")
+        if chat_request.generate_summary:
+            try:
+                summary_messages = SQL_SUMMARY_TEMPLATE.format_messages(
+                    user_question=chat_request.message,
+                    sql_query=final_sql_query
+                )
+                summary_response = await llm.ainvoke(summary_messages)
+                natural_language_summary = summary_response.content
+                print("Generated summary for query.")
+            except Exception as summary_error:
+                print(f"Error generating summary: {summary_error}")
+        
         return {
-             "sql_query": final_sql_query,
-             "query_results": f"Error during execution or summary generation: {str(e)}",
-             "natural_language_summary": "Could not generate summary due to error." if chat_request.generate_summary else None,
-             "auto_correction_used": chat_request.use_auto_correction
+            "sql_query": final_sql_query,
+            "query_results": query_results,
+            "natural_language_summary": natural_language_summary if chat_request.generate_summary else None,
+            "auto_correction_used": True,
+            "attempts": attempts,
+            "success": True,
         }
+        
+    except Exception as e:
+        print(f"Error generating summary: {e}")
+        return {
+            "sql_query": final_sql_query,
+            "query_results": query_results,
+            "natural_language_summary": "Could not generate summary due to error." if chat_request.generate_summary else None,
+            "auto_correction_used": True,
+            "attempts": attempts,
+            "success": True,
+        }
+
 
 if __name__ == "__main__":
     import uvicorn
