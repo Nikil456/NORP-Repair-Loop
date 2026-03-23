@@ -6,20 +6,24 @@ This document provides everything an AI assistant (Claude, GPT, Gemini, etc.) ne
 
 ## Project Overview
 
-NORP Repair Loop is a **natural language to SQL** query system with an iterative auto-correction loop. Users submit plain-English questions; the system generates MySQL SQL, executes it, and if errors occur it self-corrects (up to 5 attempts) before returning a natural-language answer.
+NORP Repair Loop is a **natural language to SQL** query system with an iterative self-correction loop based on the FinStat2SQL paper. Users submit plain-English questions; the system generates MySQL SQL, executes it, verifies the logic matches the user's intent, and if errors occur it self-corrects (up to 3 attempts by default) before returning a natural-language answer.
 
 **Core pipeline:**
 ```
-User Query → RAG (schema retrieval) → LLM (SQL generation) → MySQL → Auto-correction loop → NL response
+User Query → RAG (schema retrieval) → SelfCorrectionOrchestrator
+  → LLM (SQL generation) → MySQL execution 
+  → LogicVerificationAgent (verify intent)
+  → If error: Refine with feedback → Retry (up to 3 times)
+  → NL response
 ```
 
 **Key technologies:**
-- **FastAPI** — REST API server on port 8088
+- **FastAPI** — REST API server on port 8000
 - **LLM** — NVIDIA `meta/llama-3.3-70b-instruct` via `langchain-nvidia-ai-endpoints`
 - **Database** — MySQL via SQLAlchemy + LangChain `SQLDatabase`
 - **Cache** — Redis for conversation history (TTL-based, optional)
 - **RAG** — Chroma vector DB with HuggingFace `sentence-transformers` embeddings
-- **Auto-correction** — `auto_correction/auto_correction.py`, up to 5 SQL fix attempts
+- **Self-Correction** — `services/repair_loop/SelfCorrectionOrchestrator.py`, up to 3 SQL fix attempts
 
 ---
 
@@ -30,7 +34,7 @@ NORP-Repair-Loop/
 ├── app/
 │   └── app.py                  # FastAPI entrypoint — ALL requests start here
 ├── auto_correction/
-│   └── auto_correction.py      # SQL auto-correction loop (up to 5 retries)
+│   └── auto_correction.py     # DEPRECATED — replaced by services/repair_loop/
 ├── config/
 │   ├── config.json             # Local config (gitignored — do NOT commit)
 │   └── prompts.py              # All LLM prompt templates
@@ -50,8 +54,15 @@ NORP-Repair-Loop/
 │   │   └── LLMManager.py       # NVIDIA LLM initialization
 │   ├── redis_manager/
 │   │   └── RedisManager.py     # Redis conversation cache
-│   └── sql_manager/
-│       └── DatabaseManager.py  # MySQL connection via SQLAlchemy
+│   ├── sql_manager/
+│   │   └── DatabaseManager.py  # MySQL connection via SQLAlchemy
+│   └── repair_loop/            # NEW: Self-Correction Repair Loop
+│       ├── __init__.py         # Package exports
+│       ├── SelfCorrectionOrchestrator.py  # Main orchestrator
+│       ├── prompts.py           # FinStat2SQL-style refinement prompts
+│       └── verification_agent.py # Logic verification stub
+├── tests/
+│   └── test_repair_loop.py    # Unit tests for repair loop
 ├── utils/
 │   ├── setup_from_scratch.py   # Full DB + vector DB setup script
 │   ├── populate_sql.py         # Load CSVs into MySQL
@@ -162,10 +173,10 @@ The vector DB is persisted at `rag/vectordb/` using HuggingFace embeddings (`sen
 ## Running the Server
 
 ```bash
-python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8088
+python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8000
 ```
 
-The server starts at `http://127.0.0.1:8088`.
+The server starts at `http://127.0.0.1:8000`.
 
 On startup, `app/app.py` initializes (at module level):
 1. Loads `.env`
@@ -184,41 +195,120 @@ Submit a natural-language question about the NORP datasets.
 
 **Request:**
 ```bash
-curl -X POST http://127.0.0.1:8088/query \
+curl -X POST http://127.0.0.1:8000/query \
   -H "Content-Type: application/json" \
-  -d '{"query": "What is the total population of Atlanta?", "session_id": "test-session-1"}'
+  -d '{"session_id": "test-1", "message": "What is the total population of Atlanta?", "message_type": "text", "use_rag": true, "generate_summary": false}'
 ```
 
 **Request body schema:**
 ```json
 {
-  "query": "string — the natural language question",
-  "session_id": "string — used to retrieve conversation history from Redis"
+  "session_id": "string — used to retrieve conversation history from Redis",
+  "message": "string — the natural language question",
+  "message_type": "string — type of message (e.g., 'text')",
+  "use_rag": "boolean — enable RAG for schema context (default: false)",
+  "generate_summary": "boolean — enable natural language summary (default: true)"
 }
 ```
 
 **Response body schema:**
 ```json
 {
-  "answer": "string — natural language answer",
   "sql_query": "string — the SQL that was executed",
-  "raw_results": "array — raw rows from MySQL"
+  "query_results": "array — raw rows from MySQL",
+  "natural_language_summary": "string — human-readable summary",
+  "auto_correction_used": "boolean — always true in new repair loop",
+  "attempts": "number — number of attempts made (1-3)",
+  "success": "boolean — whether query succeeded"
 }
 ```
 
 **Internal flow for each `/query` request:**
 1. Retrieve conversation history from Redis (keyed by `session_id`)
 2. Call `SchemaRAG` to retrieve the top-3 most relevant table schemas from the vector DB
-3. Build prompt using templates from `config/prompts.py` (MySQL expert persona + schema context + conversation history)
-4. LLM generates SQL
-5. Execute SQL against MySQL via `DatabaseManager`
-6. If SQL fails, `AutoCorrection` loop retries up to 5 times with error feedback to LLM
-7. **{NEW} Week 10: Logic Verification Agent** — If SQL succeeds, verify it matches user intent using the FinStat2SQL Logical Critic:
-   - Checks if the query result is empty or doesn't capture the user's intent
-   - Suggests logical corrections if the query structure is correct but semantically wrong
-   - Returns results if verification passes; otherwise feeds corrected SQL back into correction loop
-8. Format results into a natural-language response
-9. Store updated conversation in Redis
+3. Initialize `SelfCorrectionOrchestrator` with LLM, DB, Redis
+4. Execute loop (up to `max_retries` times):
+   a. Generate SQL using LLM (initial or refinement based on attempt)
+   b. Execute SQL against MySQL via `QuerySQLDataBaseTool`
+   c. If execution fails: Store error, refine with error feedback, retry
+   d. If execution succeeds: Call `LogicVerificationAgent` to verify intent
+   e. If logic verification fails: Store feedback, refine with logic feedback, retry
+   f. If all pass: Return success
+5. If `max_retries` exceeded: Return error with session history
+6. Generate natural language summary if requested
+7. Store updated conversation in Redis
+
+---
+
+## Testing the Repair Loop
+
+### Test Case 1: Typo Fix (Orchestrator Catches Execution Error)
+
+This test proves the orchestrator can catch SQL execution errors (typos, invalid table/column names) and retry without human intervention.
+
+```bash
+curl -X POST "http://localhost:8000/query" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "test-001",
+    "message": "Show me all users",
+    "message_type": "text",
+    "use_rag": true,
+    "generate_summary": false
+  }'
+```
+
+**Expected behavior:**
+- Initial SQL might have a typo (e.g., `SELECT * FROM user` instead of `users`)
+- MySQL returns "Table doesn't exist" error
+- Orchestrator catches error, calls refinement with error message
+- Refined SQL corrects the typo
+- Response shows `attempts: 2` and `success: true`
+
+---
+
+### Test Case 2: Logic Error (Verification Agent Catches Wrong Query)
+
+This test proves the logic verifier catches queries that execute successfully but don't answer the user's actual question.
+
+```bash
+curl -X POST "http://localhost:8000/query" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "test-002",
+    "message": "What is the total spending by each user?",
+    "message_type": "text",
+    "use_rag": true,
+    "generate_summary": false
+  }'
+```
+
+**Expected behavior:**
+- Initial SQL might be `SELECT * FROM transactions` (returns raw data, not aggregated)
+- Execution succeeds (no SQL error)
+- Logic Verification Agent analyzes result against question
+- Verification fails: "Query doesn't aggregate by user"
+- Orchestrator passes feedback to refinement prompt
+- Corrected SQL: `SELECT user_id, SUM(amount) FROM transactions GROUP BY user_id`
+- Response shows `attempts: 2` and `success: true`
+
+---
+
+### Test Case 3: Happy Path (No Errors)
+
+```bash
+curl -X POST "http://localhost:8000/query" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "session_id": "test-003",
+    "message": "List all transaction IDs",
+    "message_type": "text",
+    "use_rag": true,
+    "generate_summary": false
+  }'
+```
+
+**Expected:** `attempts: 1`, `success: true` — no retries needed
 
 ---
 
@@ -227,9 +317,12 @@ curl -X POST http://127.0.0.1:8088/query \
 | File | Purpose |
 |---|---|
 | `app/app.py` | FastAPI app, config loading, `/query` route handler |
-| `config/prompts.py` | All prompt templates: `SQL_GENERATION_TEMPLATE`, `SQL_CORRECTION_TEMPLATE`, `SQL_SELF_CHECK_TEMPLATE`, `LOGIC_VERIFICATION_PROMPT_TEMPLATE`, `SUMMARY_TEMPLATE` |
-| `auto_correction/auto_correction.py` | `AutoCorrection` class — iterative SQL fix loop |
-| `auto_correction/logic_verification_agent.py` | **{NEW} Week 10:** `LogicVerificationAgent` class — FinStat2SQL Logical Critic for intent verification |
+| `config/prompts.py` | All prompt templates including `SQL_SUMMARY_TEMPLATE` |
+| `services/repair_loop/SelfCorrectionOrchestrator.py` | **NEW:** Main orchestrator — Generate → Execute → Verify → Refine loop |
+| `services/repair_loop/prompts.py` | **NEW:** FinStat2SQL-style refinement prompts with `{logic_feedback}` |
+| `services/repair_loop/verification_agent.py` | **NEW:** Logic verification stub (partner replaces with actual implementation) |
+| `auto_correction/logic_verification_agent.py` | `LogicVerificationAgent` class — FinStat2SQL Logical Critic for intent verification |
+| `auto_correction/auto_correction.py` | **DEPRECATED:** Replaced by `SelfCorrectionOrchestrator` |
 | `rag/rag.py` | `SchemaRAG` class — Chroma vector DB retrieval |
 | `services/service_manager.py` | `ServiceManager` — initializes DB, LLM, Redis |
 | `services/llm_manager/LLMManager.py` | Wraps `ChatNVIDIA` with API key from env |
@@ -240,121 +333,110 @@ curl -X POST http://127.0.0.1:8088/query \
 
 ---
 
-## Week 10 Deliverable: Logic Verification Agent (FinStat2SQL Logical Critic)
+## Self-Correction Orchestrator Architecture
 
-The **Logic Verification Agent** is a new component implementing the FinStat2SQL paper's Logical Critic methodology. It addresses a critical gap in the auto-correction pipeline: **catching logical errors where syntactically correct queries don't match the user's intent**.
+The `SelfCorrectionOrchestrator` class implements the FinStat2SQL repair loop from the paper (Section 4.1).
 
-### Motivation
-
-The naive auto-correction loop (Week 9) catches syntax errors (unknown columns, bad table names). However, it misses **logical errors** such as:
-- Query returns empty results when it shouldn't
-- Query structure is valid but doesn't capture user intent
-- Wrong aggregation or filtering logic
-
-The Logic Verification Agent runs after successful execution to verify semantic correctness.
-
-### Implementation Architecture
-
-**Location:** [auto_correction/logic_verification_agent.py](auto_correction/logic_verification_agent.py)
-
-**Core class:** `LogicVerificationAgent`
-- **Input:** Executed SQL query, user's natural language request, execution result
-- **Output:** 
-  - `matches_intent` (bool) — Does the query result satisfy the user's intent?
-  - `new_sql` (str) — Suggested correction if intent doesn't match (optional)
-  - `verification_metadata` (dict) — Explanation and potential issues
-
-**Integration point:** Called in `AutoCorrection.correct_query()` after successful SQL execution
+### Class Definition
 
 ```python
-# In auto_correction.py, after SQL executes successfully:
-matches_intent, new_sql, verification_metadata = await auto_correction.logic_verify_query(
-    sql_query=current_query,
-    user_request=user_request,
-    execution_result=result
+from services.repair_loop import SelfCorrectionOrchestrator
+
+orchestrator = SelfCorrectionOrchestrator(
+    llm=llm,                    # LangChain LLM (NVIDIA/GPT/etc.)
+    db=db,                      # LangChain SQLDatabase
+    redis_client=redis_client,  # Redis client
+    max_retries=3,              # Configurable retry limit (default: 3)
+    use_rag=True,               # Enable/disable RAG schema context
+    redis_ttl=3600,             # Session history TTL in seconds (default: 1 hour)
+)
+
+result = await orchestrator.execute(
+    question="Your natural language question",
+    session_id="unique-session-id",
 )
 ```
 
-### The FinStat2SQL Prompt Template
-
-The agent uses a structured prompt (from `config/prompts.py`):
-
-```
-<task> {user_query} </task>
-<result> {sql_result} </result>
-
-Based on the SQL table result in <result> tag, do you think the SQL query is correct?
-- If no result: query is incorrect (returns nothing when it shouldn't)
-- If result matches intent: return YES
-- Otherwise: return NO, provide reasoning, and suggest corrected SQL
-
-Return format:
-### Decision: {YES|NO}
-### Reasoning: {explanation}
-### SQL Query: {corrected query if NO}
-```
-
-### Pipeline Integration
-
-When a query executes successfully:
-
-1. **Syntax Check** ← Already passed (no SQL errors)
-2. **Logic Verification** (NEW Week 10)
-   - Call LLM as Logical Critic
-   - Check if result matches user intent
-   - If intent matches → Return success
-   - If intent doesn't match → Suggest correction → Feed back to auto-correction loop
-3. **Response formatting** → Return to user
-
-### Fallback Behavior
-
-If the Logic Verification Agent itself fails (LLM timeout, parse error):
-- Falls back to the legacy `self_check_query()` method
-- Logs `logic_verification_fallback = True` in response metadata
-
-### Example Usage
+### Return Value
 
 ```python
-from auto_correction.logic_verification_agent import LogicVerificationAgent
-
-# Initialize agent
-agent = LogicVerificationAgent(llm_client)
-
-# Verify a query
-matches_intent, new_sql, metadata = await agent.verify(
-    current_sql="SELECT * FROM demographic_race WHERE state='GA'",
-    user_query="How many people of each race live in Georgia?",
-    execution_result=[
-        {"state": "GA", "race": "White", "count": 5000},
-        {"state": "GA", "race": "Black", "count": 3000}
-    ]
-)
-
-# Output:
-# matches_intent = True
-# new_sql = ""
-# metadata = {"explanation": "Query correctly...", "matches_intent": True, "potential_issues": []}
+{
+    "sql_query": str,           # The final SQL query executed
+    "query_result": Any,        # Results from MySQL
+    "success": bool,            # True if query succeeded
+    "attempts": int,            # Number of attempts (1-3)
+    "error": Optional[str],     # Error message if MAX_RETRIES_EXCEEDED
+}
 ```
 
-### Configuration
+### Control Flow
 
-**Timeout:** 25 seconds (configurable per call)
-**Retry attempts:** 3 retries on timeout (configurable)
-**Output format:** Structured markdown with `### Decision:`, `### Reasoning:`, `### SQL Query:` sections
+```
+1.  Initialize state: attempt = 0, current_sql = None, final_result = None
+2.  Fetch schema_context via RAG (or fallback to db.get_table_info())
+3.  Fetch attempt_history from Redis for session_id
+4.  WHILE attempt < max_retries:
+    a.  IF attempt == 0:
+            sql = await _generate_sql(question, schema_context, history=None)
+        ELSE:
+            sql = await _refine_sql(question, failed_sql, error, schema_context, history)
+    b.  result, error = await _execute_sql(sql)
+    c.  IF error is not None:
+            # --- Execution Error Path ---
+            attempt += 1
+            Store in history: {attempt, error, sql, type: "EXECUTION_ERROR"}
+            CONTINUE to next iteration
+    d.  ELSE:
+            # --- Execution Success Path ---
+            verification = await logic_verifier.verify(sql, result, question)
+            e.  IF verification["matches_intent"] is True:
+                    # --- Happy Path ---
+                    RETURN success
+                ELSE:
+                    # --- Logic Error Path ---
+                    feedback = f"{metadata.explanation}\n\nSuggested SQL: {corrected_sql}"
+                    attempt += 1
+                    Store in history: {attempt, error: feedback, sql, type: "LOGIC_ERROR"}
+                    CONTINUE to next iteration
+5.  # MAX_RETRIES_EXCEEDED
+    RETURN failure with session_history
+```
+
+### FinStat2SQL Refinement Prompt
+
+The orchestrator uses a structured refinement prompt (from `services/repair_loop/prompts.py`):
+
+```
+**Original User Question:** {question}
+**Database Schema Context:** {schema_context}
+**Previous Failed SQL Query:** ```sql {previous_sql} ```
+**Database Error Returned:** {error_message}
+**Logic Verification Feedback:** {logic_feedback}
+**Previous Attempts History:** {attempt_history}
+
+Instructions:
+1. Think step-by-step about why the previous SQL query failed.
+2. Analyze the error message and schema to identify the root cause.
+3. Generate a corrected SQL query that fixes the issue.
+4. Ensure the new query uses ONLY tables and columns from the provided schema.
+```
 
 ---
 
 ## Running Tests
 
 ```bash
-# Unit tests
+# Unit tests for repair loop
+python -m pytest tests/test_repair_loop.py -v
+
+# All unit tests
 python -m pytest tests/
 
 # Test individual components
 python tests/test_llm_manager.py
 python tests/test_rag.py
 python tests/test_redis_conn.py
-python tests/test_logic_verification_agent.py  # NEW Week 10: Logic Verification Agent tests
+python tests/test_logic_verification_agent.py
 ```
 
 ### Manual API test:
@@ -387,11 +469,9 @@ Full `CREATE TABLE` statements for all 25 tables are in `dataset/norp/schemas/*.
 
 2. **Redis is optional**: If Redis is not running, the app starts normally but logs `Error 61 connecting to localhost:6379`. Conversation history is not persisted across requests. Fix: `brew services start redis`.
 
-3. **`await` bug in auto_correction.py line ~129**: `execute_query_func` is called without `await` in an async context. This is a pre-existing bug from the original repo — it causes a `RuntimeWarning` but execution continues synchronously.
+3. **Logic Verification Agent is a stub**: The file `services/repair_loop/verification_agent.py` currently returns `{is_valid: True, feedback: None}` for testing. Replace with actual implementation from partner.
 
-4. **OpenAI dependency in auto_correction.py**: `auto_correction/auto_correction.py` imports `ChatOpenAI` from LangChain (legacy). The main query flow and new Logic Verification Agent use NVIDIA LLM. Both `OPENAI_API_KEY` and `NVIDIA_API_KEY` must be set for full functionality.
-
-5. **{NEW Week 10} Logic Verification Agent fallback**: If the Logic Verification Agent fails (LLM timeout, parsing error), it gracefully falls back to the legacy `self_check_query()` method and logs `logic_verification_fallback = True`. This ensures the pipeline always returns results without breaking.
+4. **OPENAI_API_KEY required**: Some prompts in the codebase still reference OpenAI. Ensure `OPENAI_API_KEY` is set in `.env` for full functionality.
 
 ---
 
