@@ -8,7 +8,7 @@ from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from langchain.schema import HumanMessage, SystemMessage
 
 from services.repair_loop.prompts import FINSTAT_INITIAL_TEMPLATE, FINSTAT_REFINE_TEMPLATE
-from services.repair_loop import verification_agent
+from auto_correction.logic_verification_agent import LogicVerificationAgent
 from rag.rag import SchemaRAG
 
 
@@ -44,6 +44,7 @@ class SelfCorrectionOrchestrator:
 
         self.schema_rag = SchemaRAG() if use_rag else None
         self._execute_tool = execute_tool or QuerySQLDataBaseTool(db=db)
+        self.logic_verifier = LogicVerificationAgent(llm)
 
     def _get_schema_context(self, question: str) -> str:
         if self.use_rag and self.schema_rag and self.schema_rag.is_initialized():
@@ -140,7 +141,8 @@ class SelfCorrectionOrchestrator:
         failed_sql: str,
         error: str,
         schema_context: str,
-        attempt_history: List[Dict]
+        attempt_history: List[Dict],
+        logic_feedback: Optional[str] = None
     ) -> str:
         history_str = self._format_history_for_prompt(attempt_history)
         
@@ -149,6 +151,7 @@ class SelfCorrectionOrchestrator:
             schema_context=schema_context,
             previous_sql=failed_sql,
             error_message=error,
+            logic_feedback=logic_feedback or "No logic verification feedback provided.",
             attempt_history=history_str,
         )
         
@@ -187,6 +190,7 @@ class SelfCorrectionOrchestrator:
         current_sql = None
         final_result = None
         final_error = None
+        logic_feedback = None
         
         schema_context = self._get_schema_context(question)
         attempt_history = self._get_attempt_history(str(session_id))
@@ -203,9 +207,10 @@ class SelfCorrectionOrchestrator:
                     current_sql = await self._refine_sql(
                         question=question,
                         failed_sql=current_sql,
-                        error=final_error,
+                        error=final_error if final_error else "N/A",
                         schema_context=schema_context,
-                        attempt_history=attempt_history
+                        attempt_history=attempt_history,
+                        logic_feedback=logic_feedback
                     )
             except Exception as e:
                 attempt += 1
@@ -232,13 +237,38 @@ class SelfCorrectionOrchestrator:
                 self._store_attempt(str(session_id), attempt_history[-1])
                 continue
             
-            verification = await verification_agent.logic_verification_agent(
-                sql=current_sql,
-                results=result,
-                question=question
-            )
-            
-            if verification["is_valid"]:
+            try:
+                matches_intent, corrected_sql, metadata = await self.logic_verifier.verify(
+                    current_sql=current_sql,
+                    user_query=question,
+                    execution_result=result,
+                )
+                
+                if matches_intent:
+                    return {
+                        "sql_query": current_sql,
+                        "query_result": result,
+                        "success": True,
+                        "attempts": attempt + 1,
+                        "error": None,
+                    }
+                else:
+                    logic_feedback = f"{metadata.get('explanation', 'Logic verification failed.')}"
+                    if corrected_sql:
+                        logic_feedback += f"\n\nSuggested SQL: {corrected_sql}"
+                    
+                    attempt += 1
+                    final_error = logic_feedback
+                    attempt_history.append({
+                        "attempt": attempt,
+                        "error": logic_feedback,
+                        "sql": current_sql,
+                        "type": "LOGIC_ERROR"
+                    })
+                    self._store_attempt(str(session_id), attempt_history[-1])
+                    continue
+            except Exception as e:
+                print(f"Warning: Logic verification failed: {e}")
                 return {
                     "sql_query": current_sql,
                     "query_result": result,
@@ -246,17 +276,6 @@ class SelfCorrectionOrchestrator:
                     "attempts": attempt + 1,
                     "error": None,
                 }
-            else:
-                attempt += 1
-                final_error = verification["feedback"]
-                attempt_history.append({
-                    "attempt": attempt,
-                    "error": final_error,
-                    "sql": current_sql,
-                    "type": "LOGIC_ERROR"
-                })
-                self._store_attempt(str(session_id), attempt_history[-1])
-                continue
         
         return {
             "sql_query": current_sql,
