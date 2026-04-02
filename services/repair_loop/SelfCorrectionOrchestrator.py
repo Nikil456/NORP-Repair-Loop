@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import json
 import re
 import asyncio
+import pandas as pd
 
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from langchain.schema import HumanMessage, SystemMessage
@@ -10,6 +11,8 @@ from langchain.schema import HumanMessage, SystemMessage
 from services.repair_loop.prompts import FINSTAT_INITIAL_TEMPLATE, FINSTAT_REFINE_TEMPLATE
 from auto_correction.logic_verification_agent import LogicVerificationAgent
 from rag.rag import SchemaRAG
+from services.data_fetcher import DataFetcher
+from services.metabase_fetcher import MetabaseFetcher
 
 
 REPAIR_HISTORY_KEY_PREFIX = "repair:session:"
@@ -34,6 +37,7 @@ class SelfCorrectionOrchestrator:
         use_rag: bool = True,
         redis_ttl: int = 3600,
         execute_tool=None,
+        data_fetcher: Optional[DataFetcher] = None,
     ):
         self.llm = llm
         self.db = db
@@ -43,6 +47,14 @@ class SelfCorrectionOrchestrator:
         self.redis_ttl = redis_ttl
 
         self.schema_rag = SchemaRAG() if use_rag else None
+        
+        # Default to MetabaseFetcher if no data_fetcher provided
+        if data_fetcher is not None:
+            self.data_fetcher = data_fetcher
+        else:
+            self.data_fetcher = MetabaseFetcher()
+        
+        # Keep execute_tool for backward compatibility if needed
         self._execute_tool = execute_tool or QuerySQLDataBaseTool(db=db)
         self.logic_verifier = LogicVerificationAgent(llm)
 
@@ -175,8 +187,15 @@ class SelfCorrectionOrchestrator:
         raise last_exception or Exception("Failed to refine SQL after retries")
 
     async def _execute_sql(self, sql: str) -> Tuple[Any, Optional[str]]:
+        """Execute SQL using the configured data fetcher (default: MetabaseFetcher)."""
         try:
-            result = self._execute_tool.invoke({"query": sql})
+            # Use data_fetcher (Metabase by default)
+            result, error = self.data_fetcher.execute(sql)
+            if error:
+                return None, error
+            # Convert DataFrame to list of dicts for compatibility
+            if isinstance(result, pd.DataFrame):
+                return result.to_dict(orient='records'), None
             return result, None
         except Exception as e:
             return None, str(e)
