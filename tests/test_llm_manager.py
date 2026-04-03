@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

@@ -6,9 +6,9 @@ Do not use for new development - use SelfCorrectionOrchestrator instead.
 """
 
 from typing import Optional, Tuple, Dict, Any
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import HumanMessage, AIMessage, SystemMessage
-from langchain.memory import ConversationBufferMemory
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langchain_community.chat_message_histories import ChatMessageHistory
 from config.prompts import SQL_CORRECTION_TEMPLATE, SQL_SELF_CHECK_TEMPLATE
 from .logic_verification_agent import logic_verification_agent
 from rag.rag import SchemaRAG

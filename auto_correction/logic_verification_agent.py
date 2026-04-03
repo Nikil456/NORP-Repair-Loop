@@ -81,6 +81,7 @@ class LogicVerificationAgent:
         decision = ""
         reasoning = ""
         new_sql = ""
+        in_sql_block = False
 
         # Parse the structured output format
         for line in response_text.split("\n"):
@@ -90,9 +91,27 @@ class LogicVerificationAgent:
             elif line.startswith("### Reasoning:"):
                 reasoning = line.replace("### Reasoning:", "").strip()
             elif line.startswith("### SQL Query:"):
-                new_sql = line.replace("### SQL Query:", "").strip()
-                # Clean up markdown formatting if present
-                new_sql = new_sql.replace("```sql", "").replace("```", "").strip()
+                # Handle both inline and multiline SQL
+                sql_content = line.replace("### SQL Query:", "").strip()
+                if sql_content.startswith("```sql"):
+                    in_sql_block = True
+                    new_sql = ""
+                elif sql_content.startswith("```") and in_sql_block:
+                    in_sql_block = False
+                else:
+                    new_sql = sql_content
+            elif in_sql_block:
+                if line.startswith("```"):
+                    in_sql_block = False
+                else:
+                    new_sql += line + "\n"
+            elif new_sql and line.startswith("```"):
+                # End of SQL block
+                in_sql_block = False
+
+        # Clean up the SQL
+        new_sql = new_sql.strip()
+        new_sql = new_sql.replace("```sql", "").replace("```", "").strip()
 
         matches_intent = decision == "YES"
         return matches_intent, reasoning, new_sql
