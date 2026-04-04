@@ -1,0 +1,20 @@
+{
+  "demo_timestamp": "2026-04-03T23:57:00.590973",
+  "questions_tested": 3,
+  "new_system_results": [
+    "<bound method MockEvaluationResult.__dict__ of <__main__.MockEvaluationResult object at 0x115e5e900>>",
+    "<bound method MockEvaluationResult.__dict__ of <__main__.MockEvaluationResult object at 0x115ef0190>>",
+    "<bound method MockEvaluationResult.__dict__ of <__main__.MockEvaluationResult object at 0x115e068b0>>"
+  ],
+  "baseline_results": [
+    "<bound method MockEvaluationResult.__dict__ of <__main__.MockEvaluationResult object at 0x115ef02d0>>",
+    "<bound method MockEvaluationResult.__dict__ of <__main__.MockEvaluationResult object at 0x115e06520>>",
+    "<bound method MockEvaluationResult.__dict__ of <__main__.MockEvaluationResult object at 0x115eb0cb0>>"
+  ],
+  "summary": {
+    "new_success_rate": 1.0,
+    "baseline_success_rate": 0.3333333333333333,
+    "new_avg_attempts": 2.3333333333333335,
+    "baseline_avg_attempts": 4.333333333333333
+  }
+}

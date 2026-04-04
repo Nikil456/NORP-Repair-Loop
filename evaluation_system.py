@@ -98,6 +98,136 @@ class LegacyBaselineOrchestrator:
         except Exception as e:
             return None, str(e)
 
+    async def execute(
+        self,
+        question: str,
+        session_id: str,
+    ) -> Dict[str, Any]:
+        """Legacy baseline execution without history tracking."""
+        start_time = time.time()
+        attempt = 0
+        current_sql = None
+        schema_context = self._get_schema_context(question)
+
+        while attempt < self.max_retries:
+            try:
+                if attempt == 0:
+                    current_sql = await self._generate_sql(question, schema_context)
+                else:
+                    current_sql = await self._refine_sql(question, current_sql,
+                                                       "Previous attempt failed", schema_context)
+            except Exception as e:
+                attempt += 1
+                continue
+
+            result, error = await self._execute_sql(current_sql)
+
+            if not error:
+                execution_time = time.time() - start_time
+                return {
+                    "sql_query": current_sql,
+                    "query_result": result,
+                    "success": True,
+                    "attempts": attempt + 1,
+                    "execution_time": execution_time,
+                    "error": None,
+                }
+
+            attempt += 1
+
+        execution_time = time.time() - start_time
+        return {
+            "sql_query": current_sql,
+            "query_result": None,
+            "success": False,
+            "attempts": self.max_retries,
+            "execution_time": execution_time,
+            "error": "MAX_RETRIES_EXCEEDED",
+        }
+
+
+@dataclass
+class EvaluationResult:
+    """Result of a single evaluation run."""
+    question: str
+    success: bool
+    attempts: int
+    execution_time: float
+    final_sql: str
+    error: Optional[str] = None
+    session_id: Optional[str] = None
+
+
+@dataclass
+class BaselineResult:
+    """Legacy baseline implementation result."""
+    question: str
+    success: bool
+    attempts: int
+    execution_time: float
+    final_sql: str
+    error: Optional[str] = None
+
+
+class LegacyBaselineOrchestrator:
+    """Simplified baseline implementation without history-aware refinement."""
+
+    def __init__(self, llm, db, redis_client, max_retries: int = 3):
+        self.llm = llm
+        self.db = db
+        self.redis = redis_client
+        self.max_retries = max_retries
+
+    def _get_schema_context(self, question: str) -> str:
+        return self.db.get_table_info()
+
+    async def _generate_sql(self, question: str, schema_context: str) -> str:
+        from services.repair_loop.prompts import FINSTAT_INITIAL_TEMPLATE
+
+        prompt = FINSTAT_INITIAL_TEMPLATE.format_messages(
+            schema_context=schema_context,
+            question=question,
+        )
+
+        response = await self.llm.ainvoke(prompt)
+        return self._extract_sql_from_response(response.content)
+
+    async def _refine_sql(self, question: str, failed_sql: str, error: str,
+                         schema_context: str) -> str:
+        from services.repair_loop.prompts import FINSTAT_REFINE_TEMPLATE
+
+        prompt = FINSTAT_REFINE_TEMPLATE.format_messages(
+            question=question,
+            schema_context=schema_context,
+            previous_sql=failed_sql,
+            error_message=error,
+            logic_feedback="No logic verification feedback provided.",
+            attempt_history="No previous attempts.",
+            past_attempts="No previous attempts.",
+            latest_feedback="No additional feedback available.",
+        )
+
+        response = await self.llm.ainvoke(prompt)
+        return self._extract_sql_from_response(response.content)
+
+    def _extract_sql_from_response(self, response_content: str) -> str:
+        import re
+        sql_match = re.search(r"```sql\s*(.*?)\s*```", response_content, re.DOTALL | re.IGNORECASE)
+        if sql_match:
+            return sql_match.group(1).strip()
+        return response_content.strip()
+
+    async def _execute_sql(self, sql: str) -> tuple:
+        """Simple execution without data fetcher."""
+        try:
+            # Use basic SQLAlchemy execution
+            with self.db._engine.connect() as conn:
+                result = conn.execute(self.db._engine.text(sql))
+                rows = result.fetchall()
+                return [dict(row) for row in rows], None
+        except Exception as e:
+            return None, str(e)
+
     async def execute(self, question: str, session_id: str) -> Dict[str, Any]:
         """Legacy baseline execution without history tracking."""
         start_time = time.time()
@@ -203,7 +333,7 @@ class RepairLoopEvaluator:
 
         print(f"🔬 Starting Repair Loop Evaluation")
         print(f"📊 Testing {len(questions)} questions")
-        print(f"⚡ Comparing New System vs Legacy Baseline")
+        print(f"⚡ Comparing New System (History-Aware) vs Legacy Baseline")
         print("-" * 60)
 
         new_results = []
