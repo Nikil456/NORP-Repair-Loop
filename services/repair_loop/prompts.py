@@ -12,20 +12,18 @@ FINSTAT_REFINE_PROMPT = """You are a SQL expert performing self-correction on a 
 {previous_sql}
 ```
 
-**Database Error Returned:**
-{error_message}
+**Latest Error/Feedback:**
+{latest_feedback}
 
-**Logic Verification Feedback:**
-{logic_feedback}
-
-**Previous Attempts History:**
-{attempt_history}
+**Past Attempts History:**
+{past_attempts}
 
 **Instructions:**
-1. Think step-by-step about why the previous SQL query failed.
-2. Analyze the error message and schema to identify the root cause.
-3. Generate a corrected SQL query that fixes the issue.
-4. Ensure the new query uses ONLY tables and columns from the provided schema.
+1. Review your previous failed attempts and the critiques provided.
+2. Do NOT repeat the logic used in previous attempts; instead, use feedback to pivot your strategy.
+3. Think step-by-step about why each previous attempt failed.
+4. Generate a corrected SQL query that fixes the issue.
+5. Ensure the new query uses ONLY tables and columns from the provided schema.
 
 **Output Format:**
 ### Reasoning: {{Step-by-step explanation}}
