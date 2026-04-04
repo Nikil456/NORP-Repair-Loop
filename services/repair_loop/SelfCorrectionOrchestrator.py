@@ -3,19 +3,19 @@ from typing import Any, Dict, List, Optional, Tuple
 import json
 import re
 import asyncio
-import pandas as pd
+from datetime import datetime
 
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain.schema import HumanMessage, SystemMessage
 
 from services.repair_loop.prompts import FINSTAT_INITIAL_TEMPLATE, FINSTAT_REFINE_TEMPLATE
 from auto_correction.logic_verification_agent import LogicVerificationAgent
 from rag.rag import SchemaRAG
-from services.data_fetcher import DataFetcher
-from services.metabase_fetcher import MetabaseFetcher
 
 
-REPAIR_HISTORY_KEY_PREFIX = "repair:session:"
+REPAIR_HISTORY_KEY_PREFIX = "repair_history:session:"
+TOKEN_THRESHOLD = 2000
+MAX_KEEP_ATTEMPTS = 4
 
 
 @dataclass
@@ -37,7 +37,6 @@ class SelfCorrectionOrchestrator:
         use_rag: bool = True,
         redis_ttl: int = 3600,
         execute_tool=None,
-        data_fetcher: Optional[DataFetcher] = None,
     ):
         self.llm = llm
         self.db = db
@@ -47,14 +46,6 @@ class SelfCorrectionOrchestrator:
         self.redis_ttl = redis_ttl
 
         self.schema_rag = SchemaRAG() if use_rag else None
-        
-        # Default to MetabaseFetcher if no data_fetcher provided
-        if data_fetcher is not None:
-            self.data_fetcher = data_fetcher
-        else:
-            self.data_fetcher = MetabaseFetcher()
-        
-        # Keep execute_tool for backward compatibility if needed
         self._execute_tool = execute_tool or QuerySQLDataBaseTool(db=db)
         self.logic_verifier = LogicVerificationAgent(llm)
 
@@ -71,20 +62,47 @@ class SelfCorrectionOrchestrator:
             history_json = self.redis.lrange(key, 0, -1)
             if not history_json:
                 return []
+            
             history = []
             for item in history_json:
                 try:
-                    history.append(json.loads(item))
+                    entry = json.loads(item)
+                    # Validate new format - must have attempt_number
+                    if "attempt_number" not in entry:
+                        # Old format detected - reset history
+                        self._clear_history(session_id)
+                        return []
+                    history.append(entry)
                 except (json.JSONDecodeError, Exception):
-                    continue
+                    # Invalid JSON - reset history
+                    self._clear_history(session_id)
+                    return []
             return history
         except Exception:
             return []
 
+    def _clear_history(self, session_id: str) -> None:
+        """Clear history if old format detected."""
+        try:
+            key = f"{REPAIR_HISTORY_KEY_PREFIX}{session_id}"
+            self.redis.delete(key)
+            print(f"Cleared old-format history for session: {session_id}")
+        except Exception:
+            pass
+
     def _store_attempt(self, session_id: str, attempt: Dict) -> None:
         try:
             key = f"{REPAIR_HISTORY_KEY_PREFIX}{session_id}"
-            self.redis.rpush(key, json.dumps(attempt))
+            # Ensure entry has required fields for new format
+            entry = {
+                "attempt_number": attempt.get("attempt_number", attempt.get("attempt", 1)),
+                "sql": attempt.get("sql", ""),
+                "error": attempt.get("error", ""),
+                "logic_feedback": attempt.get("logic_feedback", ""),
+                "type": attempt.get("type", "UNKNOWN"),
+                "timestamp": attempt.get("timestamp", datetime.utcnow().isoformat())
+            }
+            self.redis.rpush(key, json.dumps(entry))
             self.redis.expire(key, self.redis_ttl)
         except Exception as e:
             print(f"Warning: Failed to store attempt in Redis: {e}")
@@ -94,8 +112,8 @@ class SelfCorrectionOrchestrator:
             return "No previous attempts."
         
         formatted = []
-        for i, attempt in enumerate(history, 1):
-            attempt_num = attempt.get("attempt", i)
+        for attempt in history:
+            attempt_num = attempt.get("attempt_number", attempt.get("attempt", "?"))
             error = attempt.get("error", "Unknown error")
             sql = attempt.get("sql", "N/A")
             error_type = attempt.get("type", "UNKNOWN")
@@ -105,6 +123,44 @@ class SelfCorrectionOrchestrator:
                 f"  Failed SQL: {sql[:200]}..."
             )
         return "\n\n".join(formatted)
+
+    def _format_past_attempts(self, history: List[Dict]) -> str:
+        """Format history into detailed Past Attempts section for prompt."""
+        if not history:
+            return "No previous attempts in this session."
+        
+        formatted = []
+        for entry in history:
+            attempt_num = entry.get("attempt_number", "?")
+            sql = entry.get("sql", "N/A")
+            error_type = entry.get("type", "UNKNOWN")
+            
+            # Get appropriate error/feedback
+            if error_type == "LOGIC_ERROR":
+                feedback = entry.get("logic_feedback", "No logic feedback.")
+            else:
+                feedback = entry.get("error", "Unknown error.")
+            
+            formatted.append(
+                f"### Attempt {attempt_num} ({error_type})\n"
+                f"SQL: ```sql\n{sql}\n```\n"
+                f"Error/Feedback: {feedback[:300]}...\n"
+            )
+        
+        return "\n\n".join(formatted)
+
+    def _trim_history(self, history: List[Dict], max_attempts: int = MAX_KEEP_ATTEMPTS) -> List[Dict]:
+        """
+        Trim history to stay within 2000 token threshold.
+        Keep: First attempt (original) + most recent failures.
+        """
+        if len(history) <= max_attempts:
+            return history
+        
+        # Keep first (original attempt), drop middle, keep recent
+        trimmed = [history[0]] + history[-(max_attempts-1):]
+        print(f"Trimmed history from {len(history)} to {len(trimmed)} entries (token threshold: {TOKEN_THRESHOLD})")
+        return trimmed
 
     def _extract_sql_from_response(self, response_content: str) -> str:
         sql_match = re.search(r"```sql\s*(.*?)\s*```", response_content, re.DOTALL | re.IGNORECASE)
@@ -157,14 +213,20 @@ class SelfCorrectionOrchestrator:
         logic_feedback: Optional[str] = None
     ) -> str:
         history_str = self._format_history_for_prompt(attempt_history)
+        past_attempts_str = self._format_past_attempts(attempt_history)
+        
+        # Determine latest feedback
+        latest_feedback = logic_feedback if logic_feedback else error
+        
+        # Apply token trimming if history is too long
+        trimmed_history = self._trim_history(attempt_history)
         
         prompt = FINSTAT_REFINE_TEMPLATE.format_messages(
             question=question,
             schema_context=schema_context,
             previous_sql=failed_sql,
-            error_message=error,
-            logic_feedback=logic_feedback or "No logic verification feedback provided.",
-            attempt_history=history_str,
+            latest_feedback=latest_feedback,
+            past_attempts=past_attempts_str,
         )
         
         max_retries = 5
@@ -187,15 +249,8 @@ class SelfCorrectionOrchestrator:
         raise last_exception or Exception("Failed to refine SQL after retries")
 
     async def _execute_sql(self, sql: str) -> Tuple[Any, Optional[str]]:
-        """Execute SQL using the configured data fetcher (default: MetabaseFetcher)."""
         try:
-            # Use data_fetcher (Metabase by default)
-            result, error = self.data_fetcher.execute(sql)
-            if error:
-                return None, error
-            # Convert DataFrame to list of dicts for compatibility
-            if isinstance(result, pd.DataFrame):
-                return result.to_dict(orient='records'), None
+            result = self._execute_tool.invoke({"query": sql})
             return result, None
         except Exception as e:
             return None, str(e)
@@ -234,10 +289,12 @@ class SelfCorrectionOrchestrator:
             except Exception as e:
                 attempt += 1
                 attempt_history.append({
-                    "attempt": attempt,
+                    "attempt_number": attempt,
                     "error": f"SQL generation failed: {str(e)}",
                     "sql": current_sql or "N/A",
-                    "type": "GENERATION_ERROR"
+                    "logic_feedback": "",
+                    "type": "GENERATION_ERROR",
+                    "timestamp": datetime.utcnow().isoformat()
                 })
                 self._store_attempt(str(session_id), attempt_history[-1])
                 continue
@@ -248,10 +305,12 @@ class SelfCorrectionOrchestrator:
                 attempt += 1
                 final_error = error
                 attempt_history.append({
-                    "attempt": attempt,
+                    "attempt_number": attempt,
                     "error": error,
                     "sql": current_sql,
-                    "type": "EXECUTION_ERROR"
+                    "logic_feedback": "",
+                    "type": "EXECUTION_ERROR",
+                    "timestamp": datetime.utcnow().isoformat()
                 })
                 self._store_attempt(str(session_id), attempt_history[-1])
                 continue
@@ -279,10 +338,12 @@ class SelfCorrectionOrchestrator:
                     attempt += 1
                     final_error = logic_feedback
                     attempt_history.append({
-                        "attempt": attempt,
-                        "error": logic_feedback,
+                        "attempt_number": attempt,
+                        "error": "",
                         "sql": current_sql,
-                        "type": "LOGIC_ERROR"
+                        "logic_feedback": logic_feedback,
+                        "type": "LOGIC_ERROR",
+                        "timestamp": datetime.utcnow().isoformat()
                     })
                     self._store_attempt(str(session_id), attempt_history[-1])
                     continue
