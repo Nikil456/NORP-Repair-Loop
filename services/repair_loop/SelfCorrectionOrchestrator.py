@@ -6,7 +6,7 @@ import asyncio
 from datetime import datetime
 
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from services.repair_loop.prompts import FINSTAT_INITIAL_TEMPLATE, FINSTAT_REFINE_TEMPLATE
 from auto_correction.logic_verification_agent import LogicVerificationAgent

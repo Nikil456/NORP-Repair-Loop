@@ -191,7 +191,7 @@ class TestLogicVerificationIntegration:
         )
 
         assert matches_intent is False
-        assert "No results" in str(metadata.get("potential_issues", []))
+        assert "Empty result table" in str(metadata.get("potential_issues", []))
 
 
 if __name__ == "__main__":

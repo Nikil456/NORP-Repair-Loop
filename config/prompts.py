@@ -1,4 +1,4 @@
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 ## Prompts to create SQL query
 # This is the first prompt with all table schema, 3 rows of every table information

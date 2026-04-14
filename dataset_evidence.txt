@@ -1,0 +1,271 @@
+================================================================================
+NORP REPAIR LOOP - DATASET METADATA AND SAMPLE DATA DEMONSTRATION
+================================================================================
+Date: 2026-04-03 22:32:14
+
+
+============================================================
+DATASET 1: Georgia_Crime_Data_2023
+============================================================
+Category: Crime & Public Safety
+Description: Comprehensive crime data for Georgia including crime types, locations, and timestamps
+
+📊 METADATA:
+   • Total Records: 596,634
+   • Data Source: Metabase NORP Database
+   • Access Method: SQL Query via Metabase API
+
+🔍 SAMPLE DATA ITEMS (First 5 records):
+--------------------------------------------------------------------------------
+Columns (19): Incident Id, Submission Date, Incident Date, Incident Hour, Incident Status, Offense Incident Id, Offense Code, Offense Name, Crime Against, Is Counter Terrorism...
+
+Record 1:
+  Incident Id: 166616443
+  Submission Date: 2023-02-14T00:00:00-05:00
+  Incident Date: 2023-01-02T00:00:00-05:00
+  Incident Hour: 18
+  Incident Status: ACCEPTED
+
+Record 2:
+  Incident Id: 178030639
+  Submission Date: 2023-10-05T00:00:00-04:00
+  Incident Date: 2023-01-02T00:00:00-05:00
+  Incident Hour: 20
+  Incident Status: ACCEPTED
+
+Record 3:
+  Incident Id: 178030639
+  Submission Date: 2023-10-05T00:00:00-04:00
+  Incident Date: 2023-01-02T00:00:00-05:00
+  Incident Hour: 20
+  Incident Status: ACCEPTED
+
+Record 4:
+  Incident Id: 178030639
+  Submission Date: 2023-10-05T00:00:00-04:00
+  Incident Date: 2023-01-02T00:00:00-05:00
+  Incident Hour: 20
+  Incident Status: ACCEPTED
+
+Record 5:
+  Incident Id: 178030639
+  Submission Date: 2023-10-05T00:00:00-04:00
+  Incident Date: 2023-01-02T00:00:00-05:00
+  Incident Hour: 20
+  Incident Status: ACCEPTED
+
+
+============================================================
+DATASET 2: atlanta_crime_data
+============================================================
+Category: Crime & Public Safety
+Description: Atlanta-specific crime incidents with detailed location and crime type information
+
+📊 METADATA:
+   • Total Records: 351,049
+   • Data Source: Metabase NORP Database
+   • Access Method: SQL Query via Metabase API
+
+🔍 SAMPLE DATA ITEMS (First 5 records):
+--------------------------------------------------------------------------------
+Columns (10): Crime_ID, Report_#, Day_Occurred, Crime_Date, Crime_Time, Crime_Type, Area_Name, Address, Longitude, Latitude
+
+Record 1:
+  Crime_ID: 2
+  Report_#: 203581144
+  Day_Occurred: Wednesday
+  Crime_Date: 2020-12-23T00:00:00-05:00
+  Crime_Time: 17:16
+
+Record 2:
+  Crime_ID: 3
+  Report_#: 203581174
+  Day_Occurred: Saturday
+  Crime_Date: 2020-12-19T00:00:00-05:00
+  Crime_Time: 21:50
+
+Record 3:
+  Crime_ID: 4
+  Report_#: 203581238
+  Day_Occurred: Wednesday
+  Crime_Date: 2020-12-23T00:00:00-05:00
+  Crime_Time: 18:05
+
+Record 4:
+  Crime_ID: 5
+  Report_#: 203581247
+  Day_Occurred: Wednesday
+  Crime_Date: 2020-12-23T00:00:00-05:00
+  Crime_Time: 18:12
+
+Record 5:
+  Crime_ID: 6
+  Report_#: 203581253
+  Day_Occurred: Wednesday
+  Crime_Date: 2020-12-23T00:00:00-05:00
+  Crime_Time: 18:00
+
+
+============================================================
+DATASET 3: demographic_race
+============================================================
+Category: Demographics
+Description: Demographic data by race and ethnicity for Georgia zip codes
+
+📊 METADATA:
+   • Total Records: 5,905
+   • Data Source: Metabase NORP Database
+   • Access Method: SQL Query via Metabase API
+
+🔍 SAMPLE DATA ITEMS (First 5 records):
+--------------------------------------------------------------------------------
+Columns (15): year, id, zipcode, race_total_population, one_race, two_or_more_races, white, black, american_indian_and_alaska_native, asian...
+
+Record 1:
+  year: 2015
+  id: 8600000US30005
+  zipcode: ZCTA5 30005
+  race_total_population: 38887
+  one_race: 37512
+
+Record 2:
+  year: 2015
+  id: 8600000US30008
+  zipcode: ZCTA5 30008
+  race_total_population: 32905
+  one_race: 31945
+
+Record 3:
+  year: 2015
+  id: 8600000US30009
+  zipcode: ZCTA5 30009
+  race_total_population: 14759
+  one_race: 14049
+
+Record 4:
+  year: 2015
+  id: 8600000US30011
+  zipcode: ZCTA5 30011
+  race_total_population: 14600
+  one_race: 14305
+
+Record 5:
+  year: 2015
+  id: 8600000US30012
+  zipcode: ZCTA5 30012
+  race_total_population: 27233
+  one_race: 26908
+
+
+============================================================
+DATASET 4: housing_value
+============================================================
+Category: Housing & Economics
+Description: Housing value data including minimum and maximum values by zip code
+
+📊 METADATA:
+   • Total Records: 47,247
+   • Data Source: Metabase NORP Database
+   • Access Method: SQL Query via Metabase API
+
+🔍 SAMPLE DATA ITEMS (First 5 records):
+--------------------------------------------------------------------------------
+Columns (6): year, id, zipcode, number_of_units, house_value_min, house_value_max
+
+Record 1:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 500
+  house_value_min: 50000
+
+Record 2:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 837
+  house_value_min: 100000
+
+Record 3:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 1498
+  house_value_min: 150000
+
+Record 4:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 3003
+  house_value_min: 200000
+
+Record 5:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 4605
+  house_value_min: 300000
+
+
+============================================================
+DATASET 5: housing_rent
+============================================================
+Category: Housing & Economics
+Description: Housing rental data with rent value ranges by zip code
+
+📊 METADATA:
+   • Total Records: 41,341
+   • Data Source: Metabase NORP Database
+   • Access Method: SQL Query via Metabase API
+
+🔍 SAMPLE DATA ITEMS (First 5 records):
+--------------------------------------------------------------------------------
+Columns (6): year, id, zipcode, number_of_units, rent_value_min, rent_value_max
+
+Record 1:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 1263
+  rent_value_min: 500
+
+Record 2:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 2873
+  rent_value_min: 1000
+
+Record 3:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 1041
+  rent_value_min: 1500
+
+Record 4:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 188
+  rent_value_min: 2000
+
+Record 5:
+  year: 2015
+  id: 8600000US30004
+  zipcode: ZCTA5 30004
+  number_of_units: 42
+  rent_value_min: 2500
+
+
+================================================================================
+DATASET DEMONSTRATION COMPLETE
+================================================================================
+
+📋 SUMMARY:
+• All datasets are accessible via Metabase API
+• Real data validation completed (596,634+ crime records)
+• Metadata includes record counts and data structure
+• Sample data shows actual data items from each dataset
+• Integration tested and working for Logic Verification Agent

@@ -16,13 +16,14 @@ def clean_column_name(column_name):
         column_name = str(column_name)
         
     # Apply the standard transformations
-    column_name = column_name.replace('_#', '_Number')
-    # column_name = column_name.replace('-', '_')
-    # column_name = column_name.replace('&', 'And')
-    # column_name = column_name.replace('%', 'Percent')
-    # column_name = column_name.replace('(', '')
-    # column_name = column_name.replace(')', '')
-    # column_name = column_name.replace('.', '')
+    column_name = column_name.replace('#', '_Number')
+    column_name = column_name.replace(' ', '_')
+    column_name = column_name.replace('-', '_')
+    column_name = column_name.replace('&', 'And')
+    column_name = column_name.replace('%', 'Percent')
+    column_name = column_name.replace('(', '')
+    column_name = column_name.replace(')', '')
+    column_name = column_name.replace('.', '')
     
     return column_name
 
