@@ -7,14 +7,15 @@ and augments prompts for SQL generation.
 import os
 import sys
 import logging
+import pytest
 from datetime import datetime
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from rag.rag import SchemaRAG
 from langchain_core.prompts import ChatPromptTemplate
 
-# Setup logger
-def setup_logger():
+@pytest.fixture
+def logger():
     """Setup and return a logger that writes to a file"""
     # Create logs directory if it doesn't exist
     logs_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs")

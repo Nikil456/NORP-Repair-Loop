@@ -15,15 +15,11 @@ from pydantic import BaseModel
 from services.service_manager import ServiceManager
 from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains.base import Chain
-import gnupg
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from typing import List, Optional, Dict, Any, Union
 import json
-from langchain.memory import ConversationBufferMemory
-from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+# Simplified memory - just use a list for now
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompt_values import ChatPromptValue
 from langchain_core.runnables.base import RunnableLambda
 from utils.constants import *
@@ -42,7 +38,13 @@ except ImportError:
 # GPG_BINARY_PATH = "/opt/homebrew/bin/gpg"
 SENSITIVE_PATH = "sensitive/openai.txt"
 
-# gpg = gnupg.GPG(binary=GPG_BINARY_PATH)
+# Try to import gnupg, but don't fail if not available
+try:
+    import gnupg
+    gpg_available = True
+except ImportError:
+    gpg_available = False
+    print("Warning: gnupg not available, some features may not work")
 def read_json(file_name):
     try:
         # Try to open the file from the current directory first
@@ -109,7 +111,7 @@ class ChatResponse(BaseModel):
     query_result: Optional[str]
     history: List[dict]
 
-async def run_sql_chain(question: str, history: List[dict], session_id: str, memory: ConversationBufferMemory, use_rag: bool = False):
+async def run_sql_chain(question: str, history: List[dict], session_id: str, memory: SimpleChatMemory, use_rag: bool = False):
     """Run the SQL generation chain with conversation history"""
     
     # Get table information - use RAG if enabled and available
@@ -281,7 +283,18 @@ class ChatResponse(BaseModel):
     sql_valid: bool
     query_result: Optional[str]
 
-def get_message_history(session_id: Union[int, str]) -> ConversationBufferMemory:
+# Simple memory replacement for LangChain 1.x compatibility
+class SimpleChatMemory:
+    def __init__(self):
+        self.messages = []
+    
+    def add_message(self, message):
+        self.messages.append(message)
+    
+    def get_messages(self):
+        return self.messages
+
+def get_message_history(session_id: Union[int, str]) -> SimpleChatMemory:
     """Get message history from Redis cache or create a new memory object"""
     try:
         # Convert the session_id to string to ensure consistent key format
@@ -289,13 +302,10 @@ def get_message_history(session_id: Union[int, str]) -> ConversationBufferMemory
         
         # Check if we have a cache for this session ID
         cached_messages = redis_client.lrange(f"chat:{session_id_str}", 0, -1)
-        print(f"length of cached essages  {len(cached_messages)}")
+        print(f"length of cached messages  {len(cached_messages)}")
         
-        # Create a new ConversationBufferMemory
-        memory = ConversationBufferMemory(
-            memory_key="history",
-            return_messages=True,
-        )
+        # Create a new SimpleChatMemory
+        memory = SimpleChatMemory()
 
         # If we have cached messages, add them to the memory
         if cached_messages:
@@ -303,11 +313,11 @@ def get_message_history(session_id: Union[int, str]) -> ConversationBufferMemory
                 try:
                     message = json.loads(message_json)
                     if message["type"] == "human":
-                        memory.chat_memory.add_message(HumanMessage(content=message["content"]))
+                        memory.add_message(HumanMessage(content=message["content"]))
                     elif message["type"] == "ai":
-                        memory.chat_memory.add_message(AIMessage(content=message["content"]))
+                        memory.add_message(AIMessage(content=message["content"]))
                     elif message["type"] == "system":
-                        memory.chat_memory.add_message(SystemMessage(content=message["content"]))
+                        memory.add_message(SystemMessage(content=message["content"]))
                 except Exception as e:
                     print(f"Error parsing cached message: {e}")
                     continue
@@ -316,11 +326,11 @@ def get_message_history(session_id: Union[int, str]) -> ConversationBufferMemory
     except Exception as e:
         print(f"Error getting message history: {e}")
         # Return a new memory object in case of error
-        return ConversationBufferMemory(memory_key="history", return_messages=True)
+        return SimpleChatMemory()
 
 
 def update_chat_memory_and_redis_history(session_id: Union[int, str], message_content:str, message_type:str, 
-                                         memory: ConversationBufferMemory) -> ConversationBufferMemory:
+                                         memory: SimpleChatMemory) -> SimpleChatMemory:
     """Save updated chat history to Redis cache and memory object"""
     try:
         # Convert the session_id to string to ensure consistent key format
@@ -342,11 +352,11 @@ def update_chat_memory_and_redis_history(session_id: Union[int, str], message_co
 
         # Update conversation buffer memory
         if message_type == 'human':
-            memory.chat_memory.add_message(HumanMessage(content=message_content))
+            memory.add_message(HumanMessage(content=message_content))
         elif message_type == 'ai':
-            memory.chat_memory.add_message(AIMessage(content=message_content))
+            memory.add_message(AIMessage(content=message_content))
         elif message_type == 'system':
-            memory.chat_memory.add_message(SystemMessage(content=message_content))
+            memory.add_message(SystemMessage(content=message_content))
         
         return memory
     except Exception as e:

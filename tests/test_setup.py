@@ -20,11 +20,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 class TestSetup(unittest.TestCase):
     """Test class to verify the setup was done correctly"""
     
+    @unittest.skip("Project uses MySQL instead of SQLite")
     def test_sqlite_database_exists(self):
         """Test that the SQLite database file exists"""
         db_path = "local_norp.db"
         self.assertTrue(os.path.exists(db_path), f"SQLite database does not exist at {db_path}")
     
+    @unittest.skip("Project uses MySQL instead of SQLite")
     def test_sqlite_has_tables(self):
         """Test that the SQLite database has tables"""
         conn = sqlite3.connect("local_norp.db")
@@ -57,7 +59,7 @@ class TestSetup(unittest.TestCase):
         print(f"Found {len(non_readme_files)} files in vector database directory")
     
     def test_config(self):
-        """Test that the config is set up correctly for SQLite"""
+        """Test that the config is set up correctly for MySQL"""
         config_path = "config/config.json"
         self.assertTrue(os.path.exists(config_path), f"Config file does not exist at {config_path}")
         
@@ -65,10 +67,10 @@ class TestSetup(unittest.TestCase):
         with open(config_path, "r") as f:
             config = json.load(f)
         
-        # Check that the database URL is set to SQLite
+        # Check that the database URL is set to MySQL
         self.assertTrue("db_url" in config, "db_url field missing from config")
-        self.assertTrue(config["db_url"].startswith("sqlite:///"), 
-                        f"db_url not set to SQLite. Got: {config['db_url']}")
+        self.assertTrue(config["db_url"].startswith("mysql"), 
+                        f"db_url not set to MySQL. Got: {config['db_url']}")
         
         print(f"Config correctly set up with db_url: {config['db_url']}")
     

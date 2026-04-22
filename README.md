@@ -55,17 +55,17 @@ python utils/setup_from_scratch.py
 **5. Start the server**
 
 ```bash
-python -m uvicorn app.app:app --reload --host 127.0.0.1 --port 8088
+python app/app.py
 ```
 
-The server will be available at `http://127.0.0.1:8088`
+The server will be available at `http://127.0.0.1:8000`
 
 ## Sending a Query
 
-In a second terminal while the server is running:
+In a second terminal while the server is running, send queries using curl:
 
 ```bash
-curl -X POST "http://127.0.0.1:8088/query" \
+curl -X POST "http://127.0.0.1:8000/query" \
   -H "Content-Type: application/json" \
   -d '{
     "session_id": 123,
@@ -84,7 +84,13 @@ Example response:
     "sql_query": "SELECT area_name, COUNT(*) as crime_count FROM la_crime_data GROUP BY area_name",
     "query_results": "...",
     "natural_language_summary": "This query counts the number of crimes in each area.",
-    "auto_correction_used": true
+    "auto_correction_used": true,
+    "attempts": 1,
+    "success": true
 }
 ```
+
+**Note**: The repair loop will attempt up to 3 times to generate valid SQL. If all attempts fail, you'll see `"success": false` and `"error": "MAX_RETRIES_EXCEEDED"`. This happens when API keys are not configured.
+
+**Important**: Make sure your `NVIDIA_API_KEY` and `OPENAI_API_KEY` environment variables are set for the repair loop to generate actual SQL queries.
 
