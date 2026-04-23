@@ -111,7 +111,7 @@ class ChatResponse(BaseModel):
     query_result: Optional[str]
     history: List[dict]
 
-async def run_sql_chain(question: str, history: List[dict], session_id: str, memory: SimpleChatMemory, use_rag: bool = False):
+async def run_sql_chain(question: str, history: List[dict], session_id: str, memory: "SimpleChatMemory", use_rag: bool = False):
     """Run the SQL generation chain with conversation history"""
     
     # Get table information - use RAG if enabled and available
@@ -294,7 +294,7 @@ class SimpleChatMemory:
     def get_messages(self):
         return self.messages
 
-def get_message_history(session_id: Union[int, str]) -> SimpleChatMemory:
+def get_message_history(session_id: Union[int, str]) -> "SimpleChatMemory":
     """Get message history from Redis cache or create a new memory object"""
     try:
         # Convert the session_id to string to ensure consistent key format
@@ -330,7 +330,7 @@ def get_message_history(session_id: Union[int, str]) -> SimpleChatMemory:
 
 
 def update_chat_memory_and_redis_history(session_id: Union[int, str], message_content:str, message_type:str, 
-                                         memory: SimpleChatMemory) -> SimpleChatMemory:
+                                         memory: "SimpleChatMemory") -> "SimpleChatMemory":
     """Save updated chat history to Redis cache and memory object"""
     try:
         # Convert the session_id to string to ensure consistent key format

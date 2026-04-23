@@ -183,6 +183,8 @@ class SelfCorrectionOrchestrator:
             schema_context=schema_context,
             question=question,
         )
+        print(f"[RepairLoop] Generating SQL for question: {question}")
+        print(f"[RepairLoop] Schema context length: {len(schema_context)}")
         
         max_retries = 5
         timeout_seconds = 25
@@ -190,15 +192,20 @@ class SelfCorrectionOrchestrator:
         
         for attempt in range(max_retries):
             try:
+                print(f"[RepairLoop] _generate_sql attempt {attempt + 1}/{max_retries}")
                 response = await asyncio.wait_for(
                     self.llm.ainvoke(prompt),
                     timeout=timeout_seconds
                 )
-                return self._extract_sql_from_response(response.content)
+                extracted_sql = self._extract_sql_from_response(response.content)
+                print(f"[RepairLoop] Generated SQL on attempt {attempt + 1}: {extracted_sql}")
+                return extracted_sql
             except asyncio.TimeoutError:
                 last_exception = asyncio.TimeoutError(f"LLM call timed out after {timeout_seconds}s")
+                print(f"[RepairLoop] _generate_sql timed out on attempt {attempt + 1}")
             except Exception as e:
                 last_exception = e
+                print(f"[RepairLoop] _generate_sql failed on attempt {attempt + 1}: {e}")
                 break
         
         raise last_exception or Exception("Failed to generate SQL after retries")
@@ -215,11 +222,12 @@ class SelfCorrectionOrchestrator:
         history_str = self._format_history_for_prompt(attempt_history)
         past_attempts_str = self._format_past_attempts(attempt_history)
         
-        # Determine latest feedback
         latest_feedback = logic_feedback if logic_feedback else error
-        
-        # Apply token trimming if history is too long
         trimmed_history = self._trim_history(attempt_history)
+        
+        print(f"[RepairLoop] Refining SQL after failure: {failed_sql}")
+        print(f"[RepairLoop] Latest feedback: {latest_feedback}")
+        print(f"[RepairLoop] Attempt history count: {len(attempt_history)}")
         
         prompt = FINSTAT_REFINE_TEMPLATE.format_messages(
             question=question,
@@ -235,24 +243,32 @@ class SelfCorrectionOrchestrator:
         
         for attempt in range(max_retries):
             try:
+                print(f"[RepairLoop] _refine_sql attempt {attempt + 1}/{max_retries}")
                 response = await asyncio.wait_for(
                     self.llm.ainvoke(prompt),
                     timeout=timeout_seconds
                 )
-                return self._extract_sql_from_response(response.content)
+                extracted_sql = self._extract_sql_from_response(response.content)
+                print(f"[RepairLoop] Refined SQL on attempt {attempt + 1}: {extracted_sql}")
+                return extracted_sql
             except asyncio.TimeoutError:
                 last_exception = asyncio.TimeoutError(f"LLM call timed out after {timeout_seconds}s")
+                print(f"[RepairLoop] _refine_sql timed out on attempt {attempt + 1}")
             except Exception as e:
                 last_exception = e
+                print(f"[RepairLoop] _refine_sql failed on attempt {attempt + 1}: {e}")
                 break
         
         raise last_exception or Exception("Failed to refine SQL after retries")
 
     async def _execute_sql(self, sql: str) -> Tuple[Any, Optional[str]]:
         try:
+            print(f"[RepairLoop] Executing SQL: {sql}")
             result = self._execute_tool.invoke({"query": sql})
+            print(f"[RepairLoop] Execution result type: {type(result)}")
             return result, None
         except Exception as e:
+            print(f"[RepairLoop] SQL execution error: {e}")
             return None, str(e)
 
     async def execute(
@@ -269,6 +285,7 @@ class SelfCorrectionOrchestrator:
         schema_context = self._get_schema_context(question)
         attempt_history = self._get_attempt_history(str(session_id))
         
+        print(f"[RepairLoop] Starting repair loop for question: {question}")
         while attempt < self.max_retries:
             try:
                 if attempt == 0:
@@ -288,6 +305,7 @@ class SelfCorrectionOrchestrator:
                     )
             except Exception as e:
                 attempt += 1
+                print(f"[RepairLoop] SQL generation exception on attempt {attempt}: {e}")
                 attempt_history.append({
                     "attempt_number": attempt,
                     "error": f"SQL generation failed: {str(e)}",
@@ -304,6 +322,7 @@ class SelfCorrectionOrchestrator:
             if error is not None:
                 attempt += 1
                 final_error = error
+                print(f"[RepairLoop] Execution failed on attempt {attempt}: {error}")
                 attempt_history.append({
                     "attempt_number": attempt,
                     "error": error,
@@ -323,6 +342,7 @@ class SelfCorrectionOrchestrator:
                 )
                 
                 if matches_intent:
+                    print(f"[RepairLoop] Logic verification passed on attempt {attempt + 1}")
                     return {
                         "sql_query": current_sql,
                         "query_result": result,
@@ -334,7 +354,7 @@ class SelfCorrectionOrchestrator:
                     logic_feedback = f"{metadata.get('explanation', 'Logic verification failed.')}"
                     if corrected_sql:
                         logic_feedback += f"\n\nSuggested SQL: {corrected_sql}"
-                    
+                    print(f"[RepairLoop] Logic verification failed on attempt {attempt + 1}: {logic_feedback}")
                     attempt += 1
                     final_error = logic_feedback
                     attempt_history.append({
