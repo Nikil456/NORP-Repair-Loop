@@ -8,9 +8,9 @@ import sys
 import os
 
 # Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from services.metabase_fetcher import MetabaseFetcher
+from services.metabase_fetcher.metabase_fetcher import MetabaseFetcher
 
 def main():
     print("=" * 60)

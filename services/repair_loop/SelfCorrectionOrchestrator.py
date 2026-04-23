@@ -11,6 +11,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from services.repair_loop.prompts import FINSTAT_INITIAL_TEMPLATE, FINSTAT_REFINE_TEMPLATE
 from auto_correction.logic_verification_agent import LogicVerificationAgent
 from rag.rag import SchemaRAG
+from services.data_fetcher import create_fetcher
 
 
 REPAIR_HISTORY_KEY_PREFIX = "repair_history:session:"
@@ -37,6 +38,7 @@ class SelfCorrectionOrchestrator:
         use_rag: bool = True,
         redis_ttl: int = 3600,
         execute_tool=None,
+        data_fetcher=None,
     ):
         self.llm = llm
         self.db = db
@@ -46,6 +48,19 @@ class SelfCorrectionOrchestrator:
         self.redis_ttl = redis_ttl
 
         self.schema_rag = SchemaRAG() if use_rag else None
+        
+        # Use data_fetcher if provided, otherwise create MetabaseFetcher by default
+        if data_fetcher:
+            self.data_fetcher = data_fetcher
+        else:
+            try:
+                self.data_fetcher = create_fetcher("metabase")
+                print("[SelfCorrectionOrchestrator] Using MetabaseFetcher")
+            except Exception as e:
+                print(f"[SelfCorrectionOrchestrator] MetabaseFetcher failed: {e}, falling back to MySQL")
+                self.data_fetcher = create_fetcher("mysql", db=db)
+        
+        # Keep execute_tool for backward compatibility, but prefer data_fetcher
         self._execute_tool = execute_tool or QuerySQLDataBaseTool(db=db)
         self.logic_verifier = LogicVerificationAgent(llm)
 
@@ -264,9 +279,22 @@ class SelfCorrectionOrchestrator:
     async def _execute_sql(self, sql: str) -> Tuple[Any, Optional[str]]:
         try:
             print(f"[RepairLoop] Executing SQL: {sql}")
-            result = self._execute_tool.invoke({"query": sql})
-            print(f"[RepairLoop] Execution result type: {type(result)}")
-            return result, None
+            # Try using data_fetcher first (Metabase)
+            try:
+                df, error = await asyncio.get_event_loop().run_in_executor(None, self.data_fetcher.execute, sql)
+                if error:
+                    print(f"[RepairLoop] DataFetcher error: {error}")
+                    return None, error
+                # Convert DataFrame to string format similar to QuerySQLDataBaseTool
+                result_str = df.to_string(index=False)
+                print(f"[RepairLoop] DataFetcher result type: DataFrame with {len(df)} rows")
+                return result_str, None
+            except Exception as e:
+                print(f"[RepairLoop] DataFetcher failed, falling back to QuerySQLDataBaseTool: {e}")
+                # Fallback to original tool
+                result = self._execute_tool.invoke({"query": sql})
+                print(f"[RepairLoop] QuerySQLDataBaseTool result type: {type(result)}")
+                return result, None
         except Exception as e:
             print(f"[RepairLoop] SQL execution error: {e}")
             return None, str(e)
